@@ -1,0 +1,90 @@
+﻿@using HoliPics.Authorization
+@using Microsoft.AspNetCore.Authorization;
+
+@inject IAuthorizationService AuthorizationService
+
+@model HoliPics.Models.Album
+
+@{
+    ViewData["Title"] = "Index";
+}
+@if ((await AuthorizationService.AuthorizeAsync(User, Model, AlbumOperations.Read)).Succeeded)
+{
+    <div class="text-center">
+        <h1 class="display-4">@Model.Name</h1>
+        <p>
+            <a asp-action="Upload" asp-route-id="@Model.Id">
+                Upload picture to album
+                <i class="bi bi-plus-square-dotted"></i>
+            </a>
+        </p>
+    </div>
+
+    <form onchange="changeDisplay()">
+        <div class="btn-group topcorner" role="group">
+            <input type="radio" class="btn-check" name="btnradio" value="default" id="default-btn" autocomplete="off" checked />
+            <label class="btn btn-outline-primary" for="default-btn">
+                <i class="bi bi-columns h3"></i>
+            </label>
+
+            <input type="radio" class="btn-check" name="btnradio" value="info" id="info-btn" autocomplete="off" />
+            <label class="btn btn-outline-primary" for="info-btn">
+                <i class="bi bi-grid-3x3-gap h3"></i>
+            </label>
+
+            <input type="radio" class="btn-check" name="btnradio" value="focus" id="focus-btn" autocomplete="off" />
+            <label class="btn btn-outline-primary" for="focus-btn">
+                <i class="bi bi-images h3"></i>
+            </label>
+        </div>
+    </form>
+
+
+
+    <div id="default-display">
+        @await Html.PartialAsync("DefaultDisplayPartial", Model)
+    </div>
+
+    <div id="info-display">
+        @await Html.PartialAsync("InfoDisplayPartial", Model)
+    </div>
+
+    <div id="focus-display">
+        @await Html.PartialAsync("FocusDisplayPartial", Model)
+    </div>
+
+   
+    
+   
+    @section Scripts {
+        <script>
+            document.getElementById("default-display").style.display = "inline";
+            document.getElementById("info-display").style.display = "none";
+            document.getElementById("focus-display").style.display = "none";
+
+            function changeDisplay() {
+                if (document.getElementById("default-btn").checked) {
+                    document.getElementById("default-display").style.display = "inline";
+                    document.getElementById("info-display").style.display = "none";
+                    document.getElementById("focus-display").style.display = "none";
+                }
+                else if (document.getElementById("info-btn").checked) {
+                    document.getElementById("default-display").style.display = "none";
+                    document.getElementById("info-display").style.display = "inline";
+                    document.getElementById("focus-display").style.display = "none";
+                }
+                else if (document.getElementById("focus-btn").checked) {
+                    document.getElementById("default-display").style.display = "none";
+                    document.getElementById("info-display").style.display = "none";
+                    document.getElementById("focus-display").style.display = "inline";
+                }
+            }
+  
+        </script>
+    }
+  
+
+    
+}
+
+

@@ -1,0 +1,13 @@
+﻿@model HoliPics.Models.Album
+
+<div>
+    @foreach (var item in Model.Images)
+    {
+        <tr>
+            <td>
+                <img src="~/images/@item" class="rounded-0" height="" width="" asp-append-version="true" />
+            </td>
+        </tr>
+    }
+</div>
+

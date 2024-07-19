@@ -1,0 +1,21 @@
+﻿@model HoliPics.VievModels.ImageViewModel
+@{
+    ViewData["Title"] = "Upload";
+}
+
+<div class ="text-center">
+    <h1 class="display-4">Upload picture to album</h1>
+    <p>Accepted formats are .gif, .jpg and .png.</p>
+    <form enctype="multipart/form-data" asp-action="Upload">
+        <div class="custom-file">
+            <input asp-for="ImageFiles" class="custom-file-input" id="customFile" accept=".gif, .jpg, .png" multiple="">            
+            <label class="custom-file-label button" for="customFile">Choose picture</label>
+        </div>
+        <span asp-validation-for="ImageFiles" class="text-danger"></span>
+        <div class="form-group">
+            <input asp-route-id="@Model.AlbumId" type="submit" value="submit" class="btn btn-sm btn-primary rounded-0 text-uppercase" />
+            <a asp-action="Index" asp-route-id="@Model.AlbumId" class="btn btn-sm btn-primary rounded-0 text-uppercase"><i class="fas fa-fast-backward"></i> Back to album</a>
+        </div>
+    </form>
+</div>
+

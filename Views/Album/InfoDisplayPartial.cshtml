@@ -1,0 +1,14 @@
+﻿@model HoliPics.Models.Album
+
+<div>
+    @foreach (var item in Model.Images)
+    {
+        <tr>
+            <td>
+                <img src="~/images/@item" class="rounded border info-display" height="" width="" asp-append-version="true" />
+                <a asp-action="Delete-Image" asp-route-id="@item">Delete</a>
+            </td>
+        </tr>
+    }
+</div>
+
