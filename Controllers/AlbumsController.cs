@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using HoliPics.Authorization;
+using Microsoft.AspNetCore.Hosting;
 
 namespace HoliPics.Controllers
 {
@@ -19,13 +20,15 @@ namespace HoliPics.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public AlbumsController(ApplicationDbContext context,
-            IAuthorizationService authorizationService, UserManager<IdentityUser> userManager)
+            IAuthorizationService authorizationService, UserManager<IdentityUser> userManager, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _authorizationService = authorizationService;
             _userManager = userManager;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Albums
@@ -82,6 +85,7 @@ namespace HoliPics.Controllers
 
                 DateTime CreationTime = DateTime.Now;
                 album.CreationTime = CreationTime;
+                album.Thumbnail = "placeholder.png";
 
                 _context.Add(album);
                 await _context.SaveChangesAsync();
@@ -143,7 +147,8 @@ namespace HoliPics.Controllers
                     album.CreatorId = original.CreatorId;
                     album.CreatedBy = original.CreatedBy;
                     album.CreationTime = original.CreationTime;
-                    album.Images = original.Images;
+                    album.Images = original.Images;   
+                    album.Thumbnail = original.Thumbnail;
 
                     _context.Update(album);
                     await _context.SaveChangesAsync();
@@ -220,33 +225,5 @@ namespace HoliPics.Controllers
             return _context.Albums.Any(e => e.Id == id);
         }
 
-        // Get the original date and time of creation of an album
-        //private DateTime GetCreationTime(int id)
-        //{
-        //    var album = _context.Album.FirstOrDefault(e => e.Id == id);
-        //    DateTime creationTime = album.CreationTime;
-        //    _context.ChangeTracker.Clear();
-        //    return creationTime;
-        //}
-
-        //// Get the id and username of the creator of the album
-        //private Tuple<string,string> GetCreator(int id)
-        //{
-        //    var album = _context.Album.FirstOrDefault(e => e.Id == id);
-        //    string creatorId = album.CreatorId;
-        //    string createdBy = album.CreatedBy;
-        //    _context.ChangeTracker.Clear();
-        //    return new Tuple<string, string>(creatorId,createdBy);
-        //}
-
-        //// Check if current user is authorized to edit or delete the album
-        //private bool IsAuthorized(int id)
-        //{
-        //    if (GetCreator(id).Item1 != HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier))
-        //    {   
-        //        return false;
-        //    }
-        //    return true;
-        //}
     }
 }

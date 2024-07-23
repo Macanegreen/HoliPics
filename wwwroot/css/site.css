@@ -1,3 +1,4 @@
+
 html {
   font-size: 14px;
 }
@@ -22,20 +23,14 @@ body {
 }
 
 
-.default-display {
-    width: 100%;
-    max-width: 400px;
-    height: auto;
-    display: inline;
+
+.closeup {
+    max-width: 100%;
+    height: 100%;
 }
 
-.gallery-item {
-
-}
-
-.info-display {
-    width: 100px;
-    height: auto;
+.ignore-padding {
+    
 }
 
 .topcorner {
@@ -44,6 +39,13 @@ body {
     position: absolute;
     top: 10px;
     right: 10px;
+}
+.leftcorner {
+    padding-top: 70px;
+    padding-left: 20px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
 }
 
 .custom-file-input {
@@ -67,4 +69,9 @@ body {
     text-align: center;
     padding: 10px;
     overflow-y: scroll;
+}
+
+.thumbnail {
+    height: auto;
+    width: 100%
 }

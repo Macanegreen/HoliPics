@@ -67,11 +67,15 @@ namespace HoliPics.Controllers
                     Image imageFile = new Image { AlbumId = id, FileName = fileName };
 
                     // Add the image filename to the album
-                    album.Images.Add(imageFile.FileName);
+                    album.Images.Add(imageFile.FileName);                    
 
                     // Track the changes to imagefile and album
                     _context.Add(imageFile);
-                }                
+                }
+                if (album.Thumbnail == "placeholder.png")
+                {
+                    album.Thumbnail = album.Images[0];
+                }
 
                 await _context.SaveChangesAsync();
 
@@ -107,6 +111,31 @@ namespace HoliPics.Controllers
             return fileNames;
         }
 
+        [Authorize]
+        public async Task<IActionResult> Picture(string id) // id = FileName
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == id);
+
+            var album = await _context.Albums
+                .FirstOrDefaultAsync(m => m.Id == image.AlbumId);
+            if (album == null)
+            {
+                return NotFound();
+            }
+            // Check is current user is authorized to edit the given album
+            var isAuthorized = await _authorizationService.AuthorizeAsync(User, album, AlbumOperations.Update);
+            if (!isAuthorized.Succeeded)
+            {
+                return Forbid();
+            }
+
+            return View(image);
+        }
 
         // GET: Album/Delete-Image/1bc...imagename
         [Authorize]
@@ -133,7 +162,7 @@ namespace HoliPics.Controllers
                 return Forbid();
             }
 
-            return View("DeleteImage", image);
+            return PartialView("DeleteImagePartial", image);
         }
 
         // POST: Album/Delete-Image/5
