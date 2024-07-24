@@ -10,6 +10,41 @@
 }
 @if ((await AuthorizationService.AuthorizeAsync(User, Model, AlbumOperations.Read)).Succeeded)
 {
+    <nav class="navbar navbar-expand navbar-dark bg-transparent full-bleed ignore-padding">
+        <div class="container-fluid">
+            <div class="navbar">
+                <a asp-area="" asp-action="Index" asp-controller="Albums" class="btn pmd-ripple-effect btn-light pmd-btn-flat rounded-circle" type="button">
+                    <i class="bi bi-arrow-left-short h3"></i>
+                </a>
+            </div>
+            <div class="navbar justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <form onchange="changeDisplay()">
+                            <div class="btn-group" role="group">
+                                <input type="radio" class="btn-check" name="btnradio" value="default" id="default-btn" autocomplete="off" checked />
+                                <label class="btn btn-outline-primary" for="default-btn">
+                                    <i class="bi bi-columns-gap h4"></i>
+                                </label>
+
+                                <input type="radio" class="btn-check" name="btnradio" value="info" id="info-btn" autocomplete="off" />
+                                <label class="btn btn-outline-primary" for="info-btn">
+                                    <i class="bi bi-grid-3x3-gap h4"></i>
+                                </label>
+
+                                <input type="radio" class="btn-check" name="btnradio" value="focus" id="focus-btn" autocomplete="off" />
+                                <label class="btn btn-outline-primary" for="focus-btn">
+                                    <i class="bi bi-images h4"></i>
+                                </label>
+                            </div>
+                        </form>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+    </nav>
+
     <div class="text-center">
         <h1 class="display-4">@Model.Name</h1>
         <p>
@@ -19,34 +54,6 @@
             </a>
         </p>
     </div>
-
-    <div class="leftcorner">
-        <a asp-area="" asp-action="Index" asp-controller="Albums" class="btn pmd-ripple-effect btn-light pmd-btn-flat rounded-circle" type="button">
-            <i class="bi bi-arrow-left-short h1"></i>            
-        </a>    
-    </div>
-
-    
-
-
-    <form onchange="changeDisplay()">
-        <div class="btn-group topcorner" role="group">
-            <input type="radio" class="btn-check" name="btnradio" value="default" id="default-btn" autocomplete="off" checked />
-            <label class="btn btn-outline-primary" for="default-btn">
-                <i class="bi bi-columns h3"></i>
-            </label>
-
-            <input type="radio" class="btn-check" name="btnradio" value="info" id="info-btn" autocomplete="off" />
-            <label class="btn btn-outline-primary" for="info-btn">
-                <i class="bi bi-grid-3x3-gap h3"></i>
-            </label>
-
-            <input type="radio" class="btn-check" name="btnradio" value="focus" id="focus-btn" autocomplete="off" />
-            <label class="btn btn-outline-primary" for="focus-btn">
-                <i class="bi bi-images h3"></i>
-            </label>
-        </div>
-    </form>
 
 
 

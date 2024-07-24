@@ -1,13 +1,25 @@
 ﻿@model HoliPics.Models.Album
 
-<div>
-    @foreach (var item in Model.Images)
-    {
-        <tr>
-            <td>
-                <img src="~/images/@item" class="rounded-0" height="" width="" asp-append-version="true" />
-            </td>
-        </tr>
-    }
-</div>
 
+
+<div id="carouselExample" class="carousel slide carousel-fade">
+    <div class="carousel-inner">
+        <div class="carousel-item active text-center">
+            <img src="~/images/@Model.Images[0]" class="closeup" asp-append-version="true" />
+        </div>
+        @foreach (var item in Model.Images)
+        {
+            <div class="carousel-item text-center">
+                <img src="~/images/@item" class="closeup" asp-append-version="true" />
+            </div>
+        }
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>

@@ -137,10 +137,9 @@ namespace HoliPics.Controllers
             return View(image);
         }
 
-        // GET: Album/Delete-Image/1bc...imagename
-        [Authorize]
-        [ActionName("Delete-Image")]
-        public async Task<IActionResult> DeleteImage(string id) // id = FileName
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SetThumbnail(string id)
         {
             if (id == null)
             {
@@ -149,12 +148,7 @@ namespace HoliPics.Controllers
 
             var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == id);
 
-            var album = await _context.Albums
-                .FirstOrDefaultAsync(m => m.Id == image.AlbumId);
-            if (album == null)
-            {
-                return NotFound();
-            }
+            var album = await _context.Albums.FindAsync(image.AlbumId);
             // Check is current user is authorized to edit the given album
             var isAuthorized = await _authorizationService.AuthorizeAsync(User, album, AlbumOperations.Update);
             if (!isAuthorized.Succeeded)
@@ -162,8 +156,46 @@ namespace HoliPics.Controllers
                 return Forbid();
             }
 
-            return PartialView("DeleteImagePartial", image);
+            if (image != null)
+            {
+                album.Thumbnail = image.FileName;
+                _context.Update(album);
+            }
+
+            await _context.SaveChangesAsync();
+
+
+            return RedirectToAction(nameof(Index), new { id = image.AlbumId });
         }
+
+
+        //// GET: Album/Delete-Image/1bc...imagename
+        //[Authorize]
+        //[ActionName("Delete-Image")]
+        //public async Task<IActionResult> DeleteImage(string id) // id = FileName
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == id);
+
+        //    var album = await _context.Albums
+        //        .FirstOrDefaultAsync(m => m.Id == image.AlbumId);
+        //    if (album == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    // Check is current user is authorized to edit the given album
+        //    var isAuthorized = await _authorizationService.AuthorizeAsync(User, album, AlbumOperations.Update);
+        //    if (!isAuthorized.Succeeded)
+        //    {
+        //        return Forbid();
+        //    }
+
+        //    return PartialView("DeleteImagePartial", image);
+        //}
 
         // POST: Album/Delete-Image/5
         [HttpPost, ActionName("Delete-Image")]
