@@ -16,6 +16,7 @@ html {
 html {
   position: relative;
   min-height: 100%;
+  overflow-x: hidden;
 }
 
 body {
@@ -34,23 +35,8 @@ body {
     transform: translateX(-50%);
 }
 
-.ignore-padding {
+.ignore-padding-top {
     margin-top: -1rem !important;
-}
-
-.topcorner {
-    padding-top: 70px;
-    padding-right: 20px;
-    position: absolute;
-    top: 10px;
-    right: 10px;
-}
-.leftcorner {
-    padding-top: 70px;
-    padding-left: 20px;
-    position: absolute;
-    top: 10px;
-    left: 10px;
 }
 
 .custom-file-input {
@@ -70,13 +56,27 @@ body {
 
 .scroll {
     height: auto;
-    max-height: 1000px;
+    max-height: calc(100vh - 260px);
     text-align: center;
     padding: 10px;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
 
 .thumbnail {
     height: auto;
     width: 100%
+}
+
+.navbar-header {
+    display: inline;
+    position: absolute;
+    transform: translateX(-50%);
+    left: 50vw;
+}
+
+.center-right {
+    display: inline;
+    position: absolute;
+    transform: translateX(-50%);
+    left: 75vw;
 }

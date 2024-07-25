@@ -10,31 +10,42 @@
 }
 @if ((await AuthorizationService.AuthorizeAsync(User, Model, AlbumOperations.Read)).Succeeded)
 {
-    <nav class="navbar navbar-expand navbar-dark bg-transparent full-bleed ignore-padding">
+    <nav class="navbar navbar-expand navbar-light full-bleed ignore-padding-top sticky-top"
+         style="background-color:rgba(255,255,255,0.7);">
         <div class="container-fluid">
             <div class="navbar">
                 <a asp-area="" asp-action="Index" asp-controller="Albums" class="btn pmd-ripple-effect btn-light pmd-btn-flat rounded-circle" type="button">
                     <i class="bi bi-arrow-left-short h3"></i>
                 </a>
             </div>
+            <div class="navbar-header">
+                <h1 class="display-4">@Model.Name</h1>
+            </div>
+            <div class="navbar center-right">
+                <a asp-action="Upload" asp-route-id="@Model.Id" class="btn pmd-ripple-effect btn-light text-primary bg-transparent pmd-btn-flat rounded-circle" type="button">
+                    <i class="bi bi-plus-square-dotted h4"></i>
+                </a>
+            </div>
             <div class="navbar justify-content-between">
+
                 <ul class="navbar-nav flex-grow-1">
+                    
                     <li class="nav-item">
                         <form onchange="changeDisplay()">
                             <div class="btn-group" role="group">
                                 <input type="radio" class="btn-check" name="btnradio" value="default" id="default-btn" autocomplete="off" checked />
-                                <label class="btn btn-outline-primary" for="default-btn">
-                                    <i class="bi bi-columns-gap h4"></i>
+                                <label class="btn btn-outline-secondary" for="default-btn">
+                                    <i class="bi bi-columns-gap h5"></i>
                                 </label>
 
                                 <input type="radio" class="btn-check" name="btnradio" value="info" id="info-btn" autocomplete="off" />
-                                <label class="btn btn-outline-primary" for="info-btn">
-                                    <i class="bi bi-grid-3x3-gap h4"></i>
+                                <label class="btn btn-outline-secondary" for="info-btn">
+                                    <i class="bi bi-grid-3x3-gap h5"></i>
                                 </label>
 
                                 <input type="radio" class="btn-check" name="btnradio" value="focus" id="focus-btn" autocomplete="off" />
-                                <label class="btn btn-outline-primary" for="focus-btn">
-                                    <i class="bi bi-images h4"></i>
+                                <label class="btn btn-outline-secondary" for="focus-btn">
+                                    <i class="bi bi-images h5"></i>
                                 </label>
                             </div>
                         </form>
@@ -44,17 +55,6 @@
             </div>
         </div>
     </nav>
-
-    <div class="text-center">
-        <h1 class="display-4">@Model.Name</h1>
-        <p>
-            <a asp-action="Upload" asp-route-id="@Model.Id">
-                Upload picture to album
-                <i class="bi bi-plus-square-dotted"></i>
-            </a>
-        </p>
-    </div>
-
 
 
     <div id="default-display">
@@ -97,10 +97,7 @@
             }
   
         </script>
-    }
-  
-
-    
+    }  
 }
 
 

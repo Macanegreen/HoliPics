@@ -1,11 +1,11 @@
 ﻿@model HoliPics.Models.Album
 
-<div class="row row-cols-3 row-cols-sm-4 row-cols-md-5 row-cols-lg-6 g-4 scroll">
+<div class="row row-cols-3 row-cols-sm-4 row-cols-md-5 row-cols-lg-6 g-4">
     @foreach (var item in Model.Images)
     {
         <div class="col">
             <a asp-action="Picture" asp-route-id="@item">
-                <img src="~/images/@item" class="w-100 shadow-1-strong rounded mb-4" asp-append-version="true" />
+                <img src="~/images/@item" class="w-100 shadow-1-strong rounded mb-4" loading="lazy" asp-append-version="true" />
             </a>
         </div>
 
