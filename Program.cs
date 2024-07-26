@@ -1,7 +1,9 @@
 using HoliPics.Authorization;
 using HoliPics.Data;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +21,20 @@ builder.Services.AddControllersWithViews();
 // Authorization handlers.
 builder.Services.AddScoped<IAuthorizationHandler,
                       AlbumIsOwnerAuthorizationHandler>();
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.ValueLengthLimit = int.MaxValue;
+    options.ValueCountLimit = int.MaxValue;
+    options.MultipartBodyLengthLimit = int.MaxValue;
+    
+});
+
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = int.MaxValue;
+});
+
 
 var app = builder.Build();
 
@@ -41,9 +57,14 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+
 app.MapRazorPages();
 
 app.Run();

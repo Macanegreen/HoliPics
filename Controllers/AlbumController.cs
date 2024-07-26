@@ -46,7 +46,7 @@ namespace HoliPics.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Upload(ImageViewModel image, int id)
+        public async Task<IActionResult> Upload(ImageViewModel images, int id)
         {
             var album = await _context.Albums.FindAsync(id);
             var isAuthorized = await _authorizationService.AuthorizeAsync(User, album, AlbumOperations.Update);
@@ -58,10 +58,29 @@ namespace HoliPics.Controllers
             
                       
             if (ModelState.IsValid)
-            {                
-                
+            {       
                 // Retrieve the uploaded images
-                List<string> fileNames = GetUploadedFile(image);
+               
+                List<string> fileNames = new List<string>();
+                if (images.ImageFiles != null)
+                {
+                    string imageFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+                    foreach (var file in images.ImageFiles)
+                    {
+                        // Assign a unique identifier to the filename
+                        var fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+                        fileNames.Add(fileName);
+
+                        // Create a new file to store the uploaded image
+                        string filePath = Path.Combine(imageFolder, fileName);
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(fileStream);
+                        }
+                    }
+
+                }
+
                 foreach (var fileName in fileNames)
                 {
                     Image imageFile = new Image { AlbumId = id, FileName = fileName };
@@ -81,35 +100,10 @@ namespace HoliPics.Controllers
 
                 return RedirectToAction(nameof(Index), new { id });                              
             }
-            
             return View(imageView);
         }
 
-        
-        private List<string> GetUploadedFile(ImageViewModel image)
-        {
-            List<string> fileNames = new List<string>();
 
-            if (image.ImageFiles != null)
-            {
-                string imageFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
-                foreach (var file in image.ImageFiles)
-                {
-                    // Assign a unique identifier to the filename
-                    var fileName = Guid.NewGuid().ToString() + "_" + file.FileName;
-                    fileNames.Add(fileName);
-
-                    // Create a new file to store the uploaded image
-                    string filePath = Path.Combine(imageFolder, fileName);
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        file.CopyTo(fileStream);
-                    }
-                }
-                
-            }
-            return fileNames;
-        }
 
         [Authorize]
         public async Task<IActionResult> Picture(string id) // id = FileName
@@ -169,33 +163,8 @@ namespace HoliPics.Controllers
         }
 
 
-        //// GET: Album/Delete-Image/1bc...imagename
-        //[Authorize]
-        //[ActionName("Delete-Image")]
-        //public async Task<IActionResult> DeleteImage(string id) // id = FileName
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+       
 
-        //    var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == id);
-
-        //    var album = await _context.Albums
-        //        .FirstOrDefaultAsync(m => m.Id == image.AlbumId);
-        //    if (album == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    // Check is current user is authorized to edit the given album
-        //    var isAuthorized = await _authorizationService.AuthorizeAsync(User, album, AlbumOperations.Update);
-        //    if (!isAuthorized.Succeeded)
-        //    {
-        //        return Forbid();
-        //    }
-
-        //    return PartialView("DeleteImagePartial", image);
-        //}
 
         // POST: Album/Delete-Image/5
         [HttpPost, ActionName("Delete-Image")]
@@ -206,7 +175,7 @@ namespace HoliPics.Controllers
             {
                 return NotFound();
             }
-            
+
             var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == id);
 
             var album = await _context.Albums.FindAsync(image.AlbumId);
@@ -217,17 +186,24 @@ namespace HoliPics.Controllers
                 return Forbid();
             }
 
-            if (image != null)
+            if (image == null)
             {
-                album.Images.Remove(id);
-                _context.Images.Remove(image);                
+                return BadRequest("Image does not exist.");
             }
+
+            album.Images.Remove(id);
+            if (album.Thumbnail == id)
+            {
+                if (album.Images.Count > 0) { album.Thumbnail = album.Images[0]; }
+                else { album.Thumbnail = "placeholder.png"; }
+            }
+            _context.Images.Remove(image);
 
             await _context.SaveChangesAsync();
 
             string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", image.FileName);
             System.IO.File.Delete(filePath);
-           
+
             return RedirectToAction(nameof(Index), new { id=image.AlbumId });
         }
 

@@ -6,9 +6,9 @@
 <div class ="text-center">
     <h1 class="display-4">Upload picture to album</h1>
     <p>Accepted formats are .gif, .jpg and .png.</p>
-    <form enctype="multipart/form-data" asp-action="Upload">
+    <form method="post" enctype="multipart/form-data" asp-action="Upload">
         <div class="custom-file">
-            <input asp-for="ImageFiles" class="custom-file-input" id="customFile" accept=".gif, .jpg, .png" multiple="">            
+            <input asp-for="ImageFiles" class="custom-file-input" id="customFile" accept=".gif, .jpg, .png" multiple>            
             <label class="custom-file-label button" for="customFile">Choose picture</label>
         </div>
         <span asp-validation-for="ImageFiles" class="text-danger"></span>

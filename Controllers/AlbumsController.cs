@@ -12,6 +12,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using HoliPics.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Routing.Constraints;
 
 namespace HoliPics.Controllers
 {
@@ -21,6 +22,7 @@ namespace HoliPics.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        
 
         public AlbumsController(ApplicationDbContext context,
             IAuthorizationService authorizationService, UserManager<IdentityUser> userManager, IWebHostEnvironment webHostEnvironment)
@@ -192,9 +194,6 @@ namespace HoliPics.Controllers
             {
                 return Forbid();
             }
-
-            
-
             return View(album);
         }
 
@@ -213,6 +212,24 @@ namespace HoliPics.Controllers
 
             if (album != null)
             {
+                foreach (var filename in album.Images)
+                {
+                    var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == filename);
+
+                    if (image == null)
+                    {
+                        return BadRequest("Image does not exist.");
+                    }
+                    _context.Images.Remove(image);
+
+                    await _context.SaveChangesAsync();
+
+                    string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", image.FileName);
+                    System.IO.File.Delete(filePath);
+                }
+
+                Console.WriteLine(album.Id);
+                
                 _context.Albums.Remove(album);
             }
 
