@@ -18,6 +18,7 @@ namespace HoliPics.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly Dictionary<string, int> _imageSizes;
+        
 
         public AlbumController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService)
         {
@@ -67,9 +68,12 @@ namespace HoliPics.Controllers
             
                       
             if (ModelState.IsValid)
-            {       
+            {
                 // Retrieve the uploaded images
-               
+                
+                long totalBytes = images.ImageFiles.Sum(f => f.Length);
+                long totalReadBytes = 0;
+
                 List<string> fileNames = new List<string>();
                 if (images.ImageFiles != null)
                 {
@@ -79,8 +83,22 @@ namespace HoliPics.Controllers
                         // Assign a unique identifier to the filename
                         var fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
                         fileNames.Add(fileName);
-                        foreach (KeyValuePair<string, int> size in _imageSizes)
+
+                        // Record the upload progress
+                        byte[] buffer = new byte[16 * 1024];
+                        using (Stream stream = file.OpenReadStream())
                         {
+                            int readBytes;
+                            while ((readBytes = stream.Read(buffer, 0, buffer.Length)) > 0)
+                            {
+                                totalReadBytes += readBytes;
+                                album.UploadProgress = (int)((float)totalReadBytes / (float)totalBytes * 100.0);
+                                await _context.SaveChangesAsync();                                
+                            }
+                        }
+
+                        foreach (KeyValuePair<string, int> size in _imageSizes)
+                        {                          
                             using Image image = Image.Load(file.OpenReadStream());
                             image.Mutate(x => x.Resize(size.Value, 0));
 
@@ -112,6 +130,14 @@ namespace HoliPics.Controllers
                 return RedirectToAction(nameof(Index), new { id });                              
             }
             return View(imageView);
+        }
+
+        // Get the progress of image uploading
+        [HttpGet]
+        public async Task<ActionResult> Progress(int id)
+        {
+            var album = await _context.Albums.FindAsync(id);
+            return this.Content(album.UploadProgress.ToString());
         }
 
 

@@ -6,16 +6,47 @@
 <div class ="text-center">
     <h1 class="display-4">Upload picture to album</h1>
     <p>Accepted formats are .gif, .jpg and .png.</p>
-    <form method="post" enctype="multipart/form-data" asp-action="Upload">
-        <div class="custom-file">
+    <form method="post" enctype="multipart/form-data" asp-action="Upload" id="uploadForm">
+        <div class="custom-file mb-4">
             <input asp-for="ImageFiles" class="custom-file-input" id="customFile" accept=".gif, .jpg, .png" multiple>            
             <label class="custom-file-label button" for="customFile">Choose picture</label>
         </div>
         <span asp-validation-for="ImageFiles" class="text-danger"></span>
         <div class="form-group">
-            <input asp-route-id="@Model.AlbumId" type="submit" value="submit" class="btn btn-sm btn-primary rounded-0 text-uppercase" />
+            <input asp-route-id="@Model.AlbumId" type="submit" value="submit" onclick="startUpdatingProgressIndicator()" class="btn btn-sm btn-primary rounded-0 text-uppercase" />
             <a asp-action="Index" asp-route-id="@Model.AlbumId" class="btn btn-sm btn-primary rounded-0 text-uppercase"><i class="fas fa-fast-backward"></i> Back to album</a>
         </div>
     </form>
 </div>
 
+
+<div class="progress" id="progressBar">
+    <div id="progress" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+        <div id="label" class="control-label">0%</div>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript" charset="utf-8">
+        var intervalId;
+        $("#progressBar").hide();
+
+        function startUpdatingProgressIndicator() {
+            $("#progressBar").show();
+            $("#progress").show();
+            $("#uploadForm").hide();
+            intervalId = setInterval(
+                function () {
+                    $.get(
+                        "/Album/progress/" + @Model.AlbumId,
+                        function (progress) {                            
+                            $("#progress").css({ width: progress + "%" });
+                            $("#label").html(progress + "%");
+                        }
+                    );
+                },
+                10
+            );
+        }
+    </script>
+}
