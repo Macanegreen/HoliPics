@@ -1,4 +1,4 @@
-﻿@model HoliPics.Models.Image
+﻿@model HoliPics.Models.Img
 
 @{
     ViewData["Title"] = "Picture";
@@ -38,8 +38,11 @@
     </div>
 </nav>
 
+@{
+    string imgName = $"Large_{Model.FileName}";
+}
 <div class="text-center">
-    <img src="~/images/@Model.FileName" class="closeup" />
+    <img src="~/images/@imgName" class="closeup" />
 </div>
 
 

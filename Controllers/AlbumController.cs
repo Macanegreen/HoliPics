@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace HoliPics.Controllers
 {
@@ -15,12 +17,19 @@ namespace HoliPics.Controllers
         private readonly ApplicationDbContext _context;
         private readonly IAuthorizationService _authorizationService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly Dictionary<string, int> _imageSizes;
 
         public AlbumController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService)
         {
             _context = context;
             _authorizationService = authorizationService;
             _webHostEnvironment = webHostEnvironment;
+            _imageSizes = new Dictionary<string, int>()
+            {
+                { "Large_", 1300 },
+                { "Medium_",  420 },
+                { "Small_", 205 }
+            };
         }
 
 
@@ -70,12 +79,14 @@ namespace HoliPics.Controllers
                         // Assign a unique identifier to the filename
                         var fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
                         fileNames.Add(fileName);
-
-                        // Create a new file to store the uploaded image
-                        string filePath = Path.Combine(imageFolder, fileName);
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        foreach (KeyValuePair<string, int> size in _imageSizes)
                         {
-                            await file.CopyToAsync(fileStream);
+                            using Image image = Image.Load(file.OpenReadStream());
+                            image.Mutate(x => x.Resize(size.Value, 0));
+
+                            // Create a new file to store the uploaded image
+                            string filePath = Path.Combine(imageFolder, size.Key + fileName);
+                            await image.SaveAsync(filePath);
                         }
                     }
 
@@ -83,7 +94,7 @@ namespace HoliPics.Controllers
 
                 foreach (var fileName in fileNames)
                 {
-                    Image imageFile = new Image { AlbumId = id, FileName = fileName };
+                    Img imageFile = new Img { AlbumId = id, FileName = fileName };
 
                     // Add the image filename to the album
                     album.Images.Add(imageFile.FileName);                    
@@ -93,7 +104,7 @@ namespace HoliPics.Controllers
                 }
                 if (album.Thumbnail == "placeholder.png")
                 {
-                    album.Thumbnail = album.Images[0];
+                    album.Thumbnail = "Medium_" + album.Images[0];
                 }
 
                 await _context.SaveChangesAsync();
@@ -152,7 +163,7 @@ namespace HoliPics.Controllers
 
             if (image != null)
             {
-                album.Thumbnail = image.FileName;
+                album.Thumbnail = "Medium_" + image.FileName;
                 _context.Update(album);
             }
 
@@ -192,17 +203,20 @@ namespace HoliPics.Controllers
             }
 
             album.Images.Remove(id);
-            if (album.Thumbnail == id)
+            if (album.Thumbnail == "Medium_" + id)
             {
-                if (album.Images.Count > 0) { album.Thumbnail = album.Images[0]; }
+                if (album.Images.Count > 0) { album.Thumbnail = "Medium_" + album.Images[0]; }
                 else { album.Thumbnail = "placeholder.png"; }
             }
             _context.Images.Remove(image);
 
             await _context.SaveChangesAsync();
 
-            string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", image.FileName);
-            System.IO.File.Delete(filePath);
+            foreach (string size in _imageSizes.Keys)
+            {
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", size + image.FileName);
+                System.IO.File.Delete(filePath);
+            }
 
             return RedirectToAction(nameof(Index), new { id=image.AlbumId });
         }

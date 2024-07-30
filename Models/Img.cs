@@ -2,7 +2,7 @@
 
 namespace HoliPics.Models
 {
-    public class Image
+    public class Img
     {
         [Key]
         public int Id { get; set; }

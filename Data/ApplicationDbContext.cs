@@ -11,6 +11,6 @@ namespace HoliPics.Data
         {
         }
         public DbSet<HoliPics.Models.Album> Albums { get; set; } = default!;
-        public DbSet<HoliPics.Models.Image> Images { get; set; } = default!;
+        public DbSet<HoliPics.Models.Img> Images { get; set; } = default!;
     }
 }

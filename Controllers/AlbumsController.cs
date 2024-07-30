@@ -22,6 +22,7 @@ namespace HoliPics.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly List<string> _imageSizes;
         
 
         public AlbumsController(ApplicationDbContext context,
@@ -31,6 +32,10 @@ namespace HoliPics.Controllers
             _authorizationService = authorizationService;
             _userManager = userManager;
             _webHostEnvironment = webHostEnvironment;
+            _imageSizes = new List<string>()
+            {
+                "Large_", "Medium_", "Small_"
+            };
         }
 
         // GET: Albums
@@ -224,8 +229,11 @@ namespace HoliPics.Controllers
 
                     await _context.SaveChangesAsync();
 
-                    string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", image.FileName);
-                    System.IO.File.Delete(filePath);
+                    foreach (string size in _imageSizes)
+                    {
+                        string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", size + image.FileName);
+                        System.IO.File.Delete(filePath);
+                    }
                 }
 
                 Console.WriteLine(album.Id);
