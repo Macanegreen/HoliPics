@@ -24,7 +24,7 @@
             <div class="col">
                 <div class="card">                    
                     <a class="link" asp-area="" asp-controller="Album" asp-action="Index" asp-route-id="@item.Id">
-                        <img src="~/images/@item.Thumbnail" class="card-img-top thumbnail" />                        
+                        <img src="/album/GetImage?filename=@item.Thumbnail" class="card-img-top thumbnail" />                        
                     </a>               
                     <div class="card-body">
                         <h5 class="card-title">@item.Name</h5>

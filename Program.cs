@@ -1,10 +1,14 @@
 using HoliPics.Authorization;
 using HoliPics.Data;
+using HoliPics.Options;
+using HoliPics.Services.Implementations;
+using HoliPics.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +25,12 @@ builder.Services.AddControllersWithViews();
 // Authorization handlers.
 builder.Services.AddScoped<IAuthorizationHandler,
                       AlbumIsOwnerAuthorizationHandler>();
+
+
+builder.Services.Configure<AzureBlobOptions>(builder.Configuration.GetSection("AzureBlob"));
+// Image service for handling communication with azure blob
+builder.Services.AddTransient<IImageService, ImageService>();
+
 
 builder.Services.Configure<FormOptions>(options =>
 {

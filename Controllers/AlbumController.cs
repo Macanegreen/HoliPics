@@ -9,6 +9,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
+using HoliPics.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace HoliPics.Controllers
 {
@@ -18,9 +20,9 @@ namespace HoliPics.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly Dictionary<string, int> _imageSizes;
-        
+        private readonly IImageService _imageService;        
 
-        public AlbumController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService)
+        public AlbumController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService)
         {
             _context = context;
             _authorizationService = authorizationService;
@@ -31,6 +33,7 @@ namespace HoliPics.Controllers
                 { "Medium_",  420 },
                 { "Small_", 205 }
             };
+            _imageService = imageService;
         }
 
 
@@ -64,20 +67,16 @@ namespace HoliPics.Controllers
             {
                 return Forbid();
             }
-            var imageView = new ImageViewModel { AlbumId = id };
-            
+            var imageView = new ImageViewModel { AlbumId = id };            
                       
             if (ModelState.IsValid)
-            {
-                // Retrieve the uploaded images
-                
+            {                                
                 long totalBytes = images.ImageFiles.Sum(f => f.Length);
                 long totalReadBytes = 0;
 
                 List<string> fileNames = new List<string>();
                 if (images.ImageFiles != null)
                 {
-                    string imageFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
                     foreach (var file in images.ImageFiles)
                     {
                         // Assign a unique identifier to the filename
@@ -97,14 +96,16 @@ namespace HoliPics.Controllers
                             }
                         }
 
+                        // Store image in different sizes
                         foreach (KeyValuePair<string, int> size in _imageSizes)
                         {                          
                             using Image image = Image.Load(file.OpenReadStream());
                             image.Mutate(x => x.Resize(size.Value, 0));
-
-                            // Create a new file to store the uploaded image
-                            string filePath = Path.Combine(imageFolder, size.Key + fileName);
-                            await image.SaveAsync(filePath);
+                            
+                            // Store the uploaded file in the cloud                            
+                            using MemoryStream mutatedImageStream = new MemoryStream();                            
+                            image.Save(mutatedImageStream, Image.DetectFormat(file.OpenReadStream()));
+                            _imageService.UploadImageToBlob(mutatedImageStream, size.Key + fileName);
                         }
                     }
 
@@ -115,7 +116,8 @@ namespace HoliPics.Controllers
                     Img imageFile = new Img { AlbumId = id, FileName = fileName };
 
                     // Add the image filename to the album
-                    album.Images.Add(imageFile.FileName);                    
+                    album.Images.Add(imageFile.FileName);
+                    album.UploadProgress = 0;
 
                     // Track the changes to imagefile and album
                     _context.Add(imageFile);
@@ -138,6 +140,14 @@ namespace HoliPics.Controllers
         {
             var album = await _context.Albums.FindAsync(id);
             return this.Content(album.UploadProgress.ToString());
+        }
+
+        
+        public async Task<ActionResult> GetImage(string filename)
+        {
+            (Stream imageStream, string contentType) = await _imageService.GetImageFromBlob(filename);
+
+            return File(imageStream, contentType);
         }
 
 
@@ -168,6 +178,7 @@ namespace HoliPics.Controllers
             return View(image);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetThumbnail(string id)
@@ -195,12 +206,8 @@ namespace HoliPics.Controllers
 
             await _context.SaveChangesAsync();
 
-
             return RedirectToAction(nameof(Index), new { id = image.AlbumId });
         }
-
-
-       
 
 
         // POST: Album/Delete-Image/5
@@ -240,8 +247,7 @@ namespace HoliPics.Controllers
 
             foreach (string size in _imageSizes.Keys)
             {
-                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", size + image.FileName);
-                System.IO.File.Delete(filePath);
+                _imageService.DeleteImageFromBlob(size + image.FileName);
             }
 
             return RedirectToAction(nameof(Index), new { id=image.AlbumId });

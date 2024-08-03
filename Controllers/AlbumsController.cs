@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using HoliPics.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing.Constraints;
+using HoliPics.Services.Interfaces;
 
 namespace HoliPics.Controllers
 {
@@ -23,10 +24,10 @@ namespace HoliPics.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly List<string> _imageSizes;
-        
+        private readonly IImageService _imageService;
 
         public AlbumsController(ApplicationDbContext context,
-            IAuthorizationService authorizationService, UserManager<IdentityUser> userManager, IWebHostEnvironment webHostEnvironment)
+            IAuthorizationService authorizationService, UserManager<IdentityUser> userManager, IWebHostEnvironment webHostEnvironment, IImageService imageService)
         {
             _context = context;
             _authorizationService = authorizationService;
@@ -36,6 +37,7 @@ namespace HoliPics.Controllers
             {
                 "Large_", "Medium_", "Small_"
             };
+            _imageService = imageService;
         }
 
         // GET: Albums
@@ -231,12 +233,9 @@ namespace HoliPics.Controllers
 
                     foreach (string size in _imageSizes)
                     {
-                        string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", size + image.FileName);
-                        System.IO.File.Delete(filePath);
+                        _imageService.DeleteImageFromBlob(size + filename);
                     }
                 }
-
-                Console.WriteLine(album.Id);
                 
                 _context.Albums.Remove(album);
             }

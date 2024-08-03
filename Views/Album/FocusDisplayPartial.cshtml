@@ -6,14 +6,14 @@
         <div class="carousel-inner">
             @{string firstImg = $"Large_{Model.Images[0]}";}
             <div class="carousel-item active text-center">
-                <img src="~/images/@firstImg" class="closeup" asp-append-version="true" />
+                <img src="/album/GetImage?filename=@firstImg" class="closeup" asp-append-version="true" />
             </div>
             @foreach (var item in Model.Images)
             {   @if (item != Model.Images[0])
                 {
                     string imgName = $"Large_{item}";
                     <div class="carousel-item text-center">
-                        <img src="~/images/@imgName" class="closeup" loading="lazy" asp-append-version="true" />
+                        <img src="/album/GetImage?filename=@imgName" class="closeup" loading="lazy" asp-append-version="true" />
                     </div>
                 }
 
