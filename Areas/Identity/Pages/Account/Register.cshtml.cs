@@ -29,13 +29,15 @@ namespace HoliPics.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -43,6 +45,7 @@ namespace HoliPics.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
         }
 
         /// <summary>
@@ -70,6 +73,11 @@ namespace HoliPics.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            
+            [DataType(DataType.Text)]
+            [Display(Name = "Username")]
+            public string? Username { get; set; }
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -113,10 +121,30 @@ namespace HoliPics.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
+                if (Input.Username == null)
+                {
+                    await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                }                
+                else
+                {
+                    await _userStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);                    
+                }
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                    await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
+
+                if (Input.Username == "Admin")
+                {                    
+                    var role = new IdentityRole("Admin");
+                    await _roleManager.CreateAsync(role);
+                    await _userManager.AddToRoleAsync(user, "Admin");
+                }
+                else
+                {
+                    var role = new IdentityRole("Guest");
+                    await _roleManager.CreateAsync(role);
+                    await _userManager.AddToRoleAsync(user, "Guest");
+                }
 
                 if (result.Succeeded)
                 {

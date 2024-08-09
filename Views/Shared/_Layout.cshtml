@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> _userManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -26,9 +29,26 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Albums" asp-action="Index">My albums</a>
-                        </li>
+                        @{
+                            var currentUser = await _userManager.GetUserAsync(User);
+                            bool albumsIsHidden = false;
+                            if (currentUser != null)
+                            {
+                                var currentUserRoles = await _userManager.GetRolesAsync(currentUser);
+                                if (currentUserRoles != null && currentUserRoles.Contains("Admin"))
+                                {
+                                    albumsIsHidden = true;
+                                    <li class="nav-item">
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="Overview">Overview</a>
+                                    </li>
+                                }
+                            }
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Albums" asp-action="Index" hidden="@albumsIsHidden">My albums</a>
+                            </li>
+
+                        }
+                        
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

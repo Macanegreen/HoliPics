@@ -107,6 +107,13 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            // Make sure that the guest account cannot be changed
+            if (user.UserName == "Guest")
+            {
+                ModelState.AddModelError(string.Empty, "You are not allowed to change password of the guest account.");
+                return Page();
+            }
+
             var changePasswordResult = await _userManager.ChangePasswordAsync(user, Input.OldPassword, Input.NewPassword);
             if (!changePasswordResult.Succeeded)
             {

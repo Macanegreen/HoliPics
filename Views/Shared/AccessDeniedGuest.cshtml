@@ -1,0 +1,12 @@
+﻿
+@{
+    ViewData["Title"] = "AccessDeniedGuest";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<header>
+    <h1 class="text-danger">Access denied</h1>
+    <p class="text-danger">Guests are not allowed to create, edit, or delete ressources.</p>
+</header>
+
+<a href="@ViewData["returnUrl"]">Return</a>

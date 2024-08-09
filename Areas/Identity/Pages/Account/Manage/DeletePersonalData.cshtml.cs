@@ -86,6 +86,15 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
                 }
             }
 
+            // Delete albums owned by user
+            if (user.UserName == "Guest")
+            {
+                ModelState.AddModelError(string.Empty, "You are not allowed to delete the guest account.");
+                return Page();
+            }
+
+            
+
             var result = await _userManager.DeleteAsync(user);
             var userId = await _userManager.GetUserIdAsync(user);
             if (!result.Succeeded)

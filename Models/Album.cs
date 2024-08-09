@@ -12,7 +12,9 @@ namespace HoliPics.Models
         public string? CreatedBy { get; set; }
         [Display(Name = "Time of creation")]
         public DateTime CreationTime { get; set; }
+        [DataType(DataType.Text)]
         public string Name { get; set; }
+        [DataType(DataType.Text)]
         public string? Description { get; set; }
         public List<string> Images { get; set; }   
         public int UploadProgress { get; set; }

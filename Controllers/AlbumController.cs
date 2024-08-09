@@ -11,18 +11,23 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using HoliPics.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace HoliPics.Controllers
 {
-    public class AlbumController : Controller
+    public class AlbumController : SuperController
     {
         private readonly ApplicationDbContext _context;
         private readonly IAuthorizationService _authorizationService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly Dictionary<string, int> _imageSizes;
-        private readonly IImageService _imageService;        
+        private readonly IImageService _imageService;   
+        private readonly UserManager<IdentityUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AlbumController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService)
+        public AlbumController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+            : base(context, webHostEnvironment, authorizationService, imageService, userManager, roleManager)
         {
             _context = context;
             _authorizationService = authorizationService;
@@ -34,19 +39,18 @@ namespace HoliPics.Controllers
                 { "Small_", 205 }
             };
             _imageService = imageService;
+            _userManager = userManager;
+            _roleManager = roleManager;
         }
 
 
         // GET: Album
-        [Authorize]
+        [Authorize]        
         public async Task<IActionResult> Index(int id)
         {            
             var album = await _context.Albums.FindAsync(id);
-            var isAuthorized = await _authorizationService.AuthorizeAsync(User, album, AlbumOperations.Update);
-            if (!isAuthorized.Succeeded)
-            {
-                return Forbid();
-            }
+            var permissionResult = await CheckPermission(album, AlbumOperations.Read);
+            if (permissionResult is not OkResult) { return permissionResult; }
             return View(album);
         }
 
@@ -62,11 +66,9 @@ namespace HoliPics.Controllers
         public async Task<IActionResult> Upload(ImageViewModel images, int id)
         {
             var album = await _context.Albums.FindAsync(id);
-            var isAuthorized = await _authorizationService.AuthorizeAsync(User, album, AlbumOperations.Update);
-            if (!isAuthorized.Succeeded)
-            {
-                return Forbid();
-            }
+            var permissionResult = await CheckPermission(album, AlbumOperations.Create);
+            if (permissionResult is not OkResult) { return permissionResult; }
+
             var imageView = new ImageViewModel { AlbumId = id };            
                       
             if (ModelState.IsValid)
@@ -108,7 +110,6 @@ namespace HoliPics.Controllers
                             _imageService.UploadImageToBlob(mutatedImageStream, size.Key + fileName);
                         }
                     }
-
                 }
 
                 foreach (var fileName in fileNames)
@@ -168,12 +169,8 @@ namespace HoliPics.Controllers
             {
                 return NotFound();
             }
-            // Check is current user is authorized to edit the given album
-            var isAuthorized = await _authorizationService.AuthorizeAsync(User, album, AlbumOperations.Update);
-            if (!isAuthorized.Succeeded)
-            {
-                return Forbid();
-            }
+            var permissionResult = await CheckPermission(album, AlbumOperations.Read);
+            if (permissionResult is not OkResult) { return permissionResult; }
 
             return View(image);
         }
@@ -187,16 +184,10 @@ namespace HoliPics.Controllers
             {
                 return NotFound();
             }
-
             var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == id);
-
             var album = await _context.Albums.FindAsync(image.AlbumId);
-            // Check is current user is authorized to edit the given album
-            var isAuthorized = await _authorizationService.AuthorizeAsync(User, album, AlbumOperations.Update);
-            if (!isAuthorized.Succeeded)
-            {
-                return Forbid();
-            }
+            var permissionResult = await CheckPermission(album, AlbumOperations.Update);
+            if (permissionResult is not OkResult) { return permissionResult; }
 
             if (image != null)
             {
@@ -221,14 +212,9 @@ namespace HoliPics.Controllers
             }
 
             var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == id);
-
             var album = await _context.Albums.FindAsync(image.AlbumId);
-            // Check is current user is authorized to edit the given album
-            var isAuthorized = await _authorizationService.AuthorizeAsync(User, album, AlbumOperations.Update);
-            if (!isAuthorized.Succeeded)
-            {
-                return Forbid();
-            }
+            var permissionResult = await CheckPermission(album, AlbumOperations.Delete);
+            if (permissionResult is not OkResult) { return permissionResult; }
 
             if (image == null)
             {

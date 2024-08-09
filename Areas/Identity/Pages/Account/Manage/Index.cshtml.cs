@@ -99,6 +99,13 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+            // Make sure that guest account cannot be changed
+            if (user.UserName == "Guest")
+            {
+                ModelState.AddModelError(string.Empty, "You are not allowed to change the guest account.");
+                return Page();
+            }
+
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {

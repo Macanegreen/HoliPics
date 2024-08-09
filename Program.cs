@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
-using System.Drawing;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,18 +18,29 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddControllersWithViews();
 
 // Authorization handlers.
 builder.Services.AddScoped<IAuthorizationHandler,
                       AlbumIsOwnerAuthorizationHandler>();
-
+builder.Services.AddScoped<IAuthorizationHandler,
+                      GuestAuthorizationHandler>();
 
 builder.Services.Configure<AzureBlobOptions>(builder.Configuration.GetSection("AzureBlob"));
 // Image service for handling communication with azure blob
 builder.Services.AddTransient<IImageService, ImageService>();
 
+
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    options.User.AllowedUserNameCharacters =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+    options.User.RequireUniqueEmail = true;
+
+});
 
 builder.Services.Configure<FormOptions>(options =>
 {
@@ -67,12 +77,9 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-
-
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
 
 
 app.MapRazorPages();

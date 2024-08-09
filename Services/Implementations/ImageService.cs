@@ -31,8 +31,7 @@ namespace HoliPics.Services.Implementations
                 {
                     ContentType = "image/bitmap"
                 }
-            }, cancellationToken: default);
-            //imageStream.Dispose();
+            }, cancellationToken: default);            
         }
 
         public async void DeleteImageFromBlob(string uniqueName)
@@ -57,9 +56,7 @@ namespace HoliPics.Services.Implementations
             await blobClient.DownloadToAsync(imageStream);
             imageStream.Position = 0;
             return (imageStream, blobProperties.ContentType);
-        }
-
-        
+        }        
     }
 }
 

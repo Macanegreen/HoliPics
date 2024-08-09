@@ -113,6 +113,14 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
             }
 
             var email = await _userManager.GetEmailAsync(user);
+
+            // Make sure that the guest account cannot be changed
+            if (user.UserName == "Guest")
+            {
+                ModelState.AddModelError(string.Empty, "You are not allowed to change email of the guest account.");
+                return Page();
+            }
+
             if (Input.NewEmail != email)
             {
                 var userId = await _userManager.GetUserIdAsync(user);

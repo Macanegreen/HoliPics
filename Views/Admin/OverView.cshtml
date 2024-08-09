@@ -1,0 +1,158 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> _userManager
+
+@{
+    ViewData["Title"] = "OverView";
+}
+
+<style>
+    .dropdown-submenu {
+        position: relative;
+    }
+
+        .dropdown-submenu .dropdown-menu {
+            top: 0;
+            left: 100%;
+            margin-top: -1px;
+        }
+</style>
+
+<div class="mb-3">
+    <h3>Users</h3>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col"></th>
+                <th scope="col">Roles</th>
+                <th scope="col">Username</th>
+                <th scope="col">Email</th>                     
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                var users = ViewData["Users"] as List<IdentityUser>;
+                var allRoles = ViewData["Roles"] as List<IdentityRole>;
+                if (allRoles == null){ allRoles = new List<IdentityRole>([]); }
+                if (users != null)
+                {
+                    string userString = "user";
+                    int userCount = 0;
+                    foreach (var user in users)
+                    {
+                        userCount += 1;
+                        var userRoles = await _userManager.GetRolesAsync(user);
+                        string roles = "";
+                        if (userRoles != null){ roles = String.Join(",", userRoles); }
+                        else { roles = ""; }
+                        <tr class="align-middle" data-bs-toggle="collapse" data-bs-target="#@userString">
+                            <td data-bs-toggle="collapse" data-bs-target="#@userString">
+                                @if (user.UserName != "Admin")
+                                {
+                                    <i class="bi bi-pencil-square h4"></i>
+                                }
+                            </td>
+                            <th scope="row">@roles</th>
+                            <td>@user.UserName</td>
+                            <td>@user.Email</td>                            
+                        </tr>
+                        if (user.UserName != "Admin")
+                        {
+                            <tr id="@userString" class="align-middle collapse"> 
+                                <td></td>
+                                <td colspan="2" class="btn-group dropend">
+                                    <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Configure roles
+                                    </button>
+                                    <ul class="dropdown-menu">                                    
+                                        <li class="dropdown-submenu">
+                                            <a class="test dropdown-item" tabindex="-1" href="#">Add role </a>
+                                            <ul class="dropdown-menu">
+                                                @foreach (var role in allRoles)
+                                                {
+                                                    <li>
+                                                        <form action="/Admin/AddUserToRole" method="post">
+                                                            <div class="">
+                                                                <input value="@user.Id" name="userId" hidden/>
+                                                                <input class="" value="@role.Name" name="roleName" hidden />
+                                                            </div>
+                                                            <div class="">
+                                                                <input type="submit" value="@role.Name" class="dropdown-item" />
+                                                            </div>
+                                                        </form>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                        <li class="dropdown-submenu">
+                                            <a class="test dropdown-item" tabindex="-1" href="#">Remove role </a>
+                                            <ul class="dropdown-menu">
+                                                @foreach (var role in roles.Split(',').ToList())
+                                                {
+                                                    <li>
+                                                        <form action="/Admin/RemoveUserFromRole" method="post">
+                                                            <div class="">
+                                                                <input value="@user.Id" name="userId" hidden />
+                                                                <input class="" value="@role" name="roleName" hidden />
+                                                            </div>
+                                                            <div class="">
+                                                                <input type="submit" value="@role" class="dropdown-item" />
+                                                            </div>
+                                                        </form>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </td>
+                                <td colspan="2" class="text-center">
+                                    <a class="btn btn-danger">Delete user</a>
+                                </td>                            
+                            </tr>
+                        }
+                        userString += userCount.ToString();
+                    }
+                }
+            }         
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <h3>Roles</h3>   
+    <table class="table table-bordered mb-0 border-">        
+        <tbody>
+            @{
+                <tr>
+                    @foreach (var role in allRoles)
+                    {
+                        <td>@role.Name</td>
+                    }
+                </tr>
+            }
+        </tbody>        
+    </table>
+    <div class="mt-0 border-top-0">
+        <form id="addRoleForm" action="/Admin/CreateRole" method="post">
+            <div class="form-group mb-2">
+                <label class="control-label"></label>
+                <input class="form-control" type="text" name="roleName" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create new role" class="btn btn-primary" />                
+            </div>
+        </form>
+    </div>    
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.dropdown-submenu a.test').on("click", function (e) {
+                $(this).next('ul').toggle();
+                e.stopPropagation();
+                e.preventDefault();
+            });
+        });
+    </script>
+}

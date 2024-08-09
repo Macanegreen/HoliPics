@@ -65,6 +65,13 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
             }
 
+            // Make sure that guest account cannot be changed
+            if (user.UserName == "Guest")
+            {
+                ModelState.AddModelError(string.Empty, "You are not allowed to change the guest account.");
+                return Page();
+            }
+
             HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null;
             Is2faEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
             IsMachineRemembered = await _signInManager.IsTwoFactorClientRememberedAsync(user);
@@ -79,6 +86,13 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            // Make sure that guest account cannot be changed
+            if (user.UserName == "Guest")
+            {
+                ModelState.AddModelError(string.Empty, "You are not allowed to change the guest account.");
+                return Page();
             }
 
             await _signInManager.ForgetTwoFactorClientAsync();
