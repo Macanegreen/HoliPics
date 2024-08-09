@@ -1,5 +1,6 @@
-﻿@using Microsoft.AspNetCore.Identity
-@inject UserManager<IdentityUser> _userManager
+﻿@using HoliPics.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<HoliPicsUser> _userManager
 
 @{
     ViewData["Title"] = "OverView";
@@ -30,9 +31,9 @@
         </thead>
         <tbody>
             @{
-                var users = ViewData["Users"] as List<IdentityUser>;
-                var allRoles = ViewData["Roles"] as List<IdentityRole>;
-                if (allRoles == null){ allRoles = new List<IdentityRole>([]); }
+                var users = ViewData["Users"] as List<HoliPicsUser>;
+                var allRoles = ViewData["Roles"] as List<HoliPicsUser>;
+                if (allRoles == null) { allRoles = new List<HoliPicsUser>([]); }
                 if (users != null)
                 {
                     string userString = "user";

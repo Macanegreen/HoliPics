@@ -4,6 +4,7 @@
 
 using System;
 using System.Threading.Tasks;
+using HoliPics.Areas.Identity.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,11 +14,11 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
 {
     public class Disable2faModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<HoliPicsUser> _userManager;
         private readonly ILogger<Disable2faModel> _logger;
 
         public Disable2faModel(
-            UserManager<IdentityUser> userManager,
+            UserManager<HoliPicsUser> userManager,
             ILogger<Disable2faModel> logger)
         {
             _userManager = userManager;

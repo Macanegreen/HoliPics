@@ -1,6 +1,7 @@
-﻿@using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+﻿@using HoliPics.Areas.Identity.Data
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<HoliPicsUser> SignInManager
+@inject UserManager<HoliPicsUser> UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))

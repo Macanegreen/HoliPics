@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Net;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.IdentityModel.Tokens;
+using HoliPics.Areas.Identity.Data;
 
 namespace HoliPics.Controllers
 {
@@ -19,11 +20,11 @@ namespace HoliPics.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly IWebHostEnvironment _webHostEnvironment;       
         private readonly IImageService _imageService;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<HoliPicsUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         
 
-        public SuperController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public SuperController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<HoliPicsUser> userManager, RoleManager<IdentityRole> roleManager)
         {
             _context = context;
             _authorizationService = authorizationService;

@@ -1,4 +1,5 @@
-﻿using HoliPics.Data;
+﻿using HoliPics.Areas.Identity.Data;
+using HoliPics.Data;
 using HoliPics.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -15,10 +16,10 @@ namespace HoliPics.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IImageService _imageService;
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<HoliPicsUser> _userManager;
 
         public AdminController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService,
-            IImageService imageService, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
+            IImageService imageService, RoleManager<IdentityRole> roleManager, UserManager<HoliPicsUser> userManager)
             : base(context, webHostEnvironment, authorizationService, imageService, userManager, roleManager)
         {
             _context = context;

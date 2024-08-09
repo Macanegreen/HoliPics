@@ -9,5 +9,9 @@ namespace HoliPics.Areas.Identity.Data;
 // Add profile data for application users by adding properties to the HoliPicsUser class
 public class HoliPicsUser : IdentityUser
 {
+    [PersonalData]
+    public string? Name { get; set; }
+    [PersonalData]
+    public List<int>? Albums { get; set; }
 }
 

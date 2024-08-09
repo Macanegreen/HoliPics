@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using HoliPics.Areas.Identity.Data;
 using HoliPics.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
@@ -9,11 +10,11 @@ namespace HoliPics.Authorization
 {
     public class GuestAuthorizationHandler : AuthorizationHandler<OperationAuthorizationRequirement>
     {
-        UserManager<IdentityUser> _userManager;
+        UserManager<HoliPicsUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<GuestAuthorizationHandler> _logger;
 
-        public GuestAuthorizationHandler(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<GuestAuthorizationHandler> logger)
+        public GuestAuthorizationHandler(UserManager<HoliPicsUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<GuestAuthorizationHandler> logger)
         {
             _userManager = userManager;
             _logger = logger;

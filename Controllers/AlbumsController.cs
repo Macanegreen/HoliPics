@@ -12,6 +12,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using HoliPics.Authorization;
 using HoliPics.Services.Interfaces;
+using HoliPics.Areas.Identity.Data;
 
 namespace HoliPics.Controllers
 {
@@ -20,14 +21,14 @@ namespace HoliPics.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IAuthorizationService _authorizationService;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<HoliPicsUser> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly List<string> _imageSizes;
         private readonly IImageService _imageService;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public AlbumsController(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+            IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<HoliPicsUser> userManager, RoleManager<IdentityRole> roleManager)
             : base(context, webHostEnvironment, authorizationService, imageService, userManager, roleManager)
         {
             _context = context;

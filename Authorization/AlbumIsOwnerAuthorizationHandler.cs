@@ -1,4 +1,5 @@
 ﻿using Azure.Core;
+using HoliPics.Areas.Identity.Data;
 using HoliPics.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
@@ -9,11 +10,11 @@ namespace HoliPics.Authorization
 {
     public class AlbumIsOwnerAuthorizationHandler : AuthorizationHandler<OperationAuthorizationRequirement, Album>
     {
-        UserManager<IdentityUser> _userManager;
+        UserManager<HoliPicsUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AlbumIsOwnerAuthorizationHandler> _logger;
 
-        public AlbumIsOwnerAuthorizationHandler(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<AlbumIsOwnerAuthorizationHandler> logger)
+        public AlbumIsOwnerAuthorizationHandler(UserManager<HoliPicsUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<AlbumIsOwnerAuthorizationHandler> logger)
         {
             _userManager = userManager;
             _logger = logger;
