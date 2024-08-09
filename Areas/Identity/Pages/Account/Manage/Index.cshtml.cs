@@ -31,6 +31,7 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public string Username { get; set; }
+            
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -51,8 +52,11 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
         ///     directly from your code. This API may change or be removed in future releases.
         /// </summary>
         public class InputModel
-        {            
-            
+        {
+            [Display(Name = "Name")]
+            [DataType(DataType.Text)]
+            public string Name {  set; get; }
+
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -69,9 +73,10 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
 
             Username = userName;
 
+
             Input = new InputModel
             {
-                
+                Name = user.Name,
                 PhoneNumber = phoneNumber
             };
         }
@@ -119,6 +124,13 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
                     return RedirectToPage();
                 }
             }
+
+            if (Input.Name != user.Name)
+            {
+                user.Name = Input.Name;
+            }
+
+            await _userManager.UpdateAsync(user);
 
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";

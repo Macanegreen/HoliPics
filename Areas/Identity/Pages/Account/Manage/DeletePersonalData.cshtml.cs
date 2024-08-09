@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using HoliPics.Areas.Identity.Data;
+using HoliPics.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -18,15 +19,18 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<HoliPicsUser> _userManager;
         private readonly SignInManager<HoliPicsUser> _signInManager;
         private readonly ILogger<DeletePersonalDataModel> _logger;
+        private readonly IAlbumDeleteService _albumDeleteService;
 
         public DeletePersonalDataModel(
             UserManager<HoliPicsUser> userManager,
             SignInManager<HoliPicsUser> signInManager,
-            ILogger<DeletePersonalDataModel> logger)
+            ILogger<DeletePersonalDataModel> logger,
+            IAlbumDeleteService albumDeleteService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
+            _albumDeleteService = albumDeleteService;
         }
 
         /// <summary>
@@ -94,6 +98,10 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+            foreach (int albumId in user.Albums)
+            {
+                await _albumDeleteService.DeleteAlbum(albumId);
+            }
             
 
             var result = await _userManager.DeleteAsync(user);
@@ -109,5 +117,7 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
 
             return Redirect("~/");
         }
+
+        
     }
 }

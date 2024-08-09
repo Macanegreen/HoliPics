@@ -1,5 +1,6 @@
 ﻿using HoliPics.Areas.Identity.Data;
 using HoliPics.Data;
+using HoliPics.Services.Implementations;
 using HoliPics.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -60,6 +61,30 @@ namespace HoliPics.Controllers
         {            
             var user = await _userManager.FindByIdAsync(userId);
             await _userManager.RemoveFromRoleAsync(user, roleName);
+            return RedirectToAction(nameof(Overview));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser([FromServices] IAlbumDeleteService albumDeleteService, string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            }
+
+            foreach (int albumId in user.Albums)
+            {
+                Console.WriteLine(albumId.ToString());
+                await albumDeleteService.DeleteAlbum(albumId);
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+           
+            if (!result.Succeeded)
+            {
+                throw new InvalidOperationException($"Unexpected error occurred deleting user.");
+            }
             return RedirectToAction(nameof(Overview));
         }
 

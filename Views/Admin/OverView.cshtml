@@ -32,8 +32,8 @@
         <tbody>
             @{
                 var users = ViewData["Users"] as List<HoliPicsUser>;
-                var allRoles = ViewData["Roles"] as List<HoliPicsUser>;
-                if (allRoles == null) { allRoles = new List<HoliPicsUser>([]); }
+                var allRoles = ViewData["Roles"] as List<IdentityRole>;
+                if (allRoles == null) { allRoles = new List<IdentityRole>([]); }
                 if (users != null)
                 {
                     string userString = "user";
@@ -106,7 +106,14 @@
                                     </ul>
                                 </td>
                                 <td colspan="2" class="text-center">
-                                    <a class="btn btn-danger">Delete user</a>
+                                    <form action="/Admin/DeleteUser" method="post">
+                                        <div class="">
+                                            <input value="@user.Id" name="userId" hidden />
+                                        </div>
+                                        <div class="">
+                                            <input type="submit" value="Delete user" class="btn btn-danger" />
+                                        </div>
+                                    </form>
                                 </td>                            
                             </tr>
                         }

@@ -74,7 +74,11 @@ namespace HoliPics.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
-            
+
+            [DataType(DataType.Text)]
+            [Display(Name = "Name")]
+            public string? Name { get; set; }
+
             [DataType(DataType.Text)]
             [Display(Name = "Username")]
             public string? Username { get; set; }
@@ -122,6 +126,7 @@ namespace HoliPics.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
+                user.Name = Input.Name;
                 if (Input.Username == null)
                 {
                     await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);

@@ -112,6 +112,8 @@ namespace HoliPics.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                Console.WriteLine(Input.Email);
+                Console.WriteLine("BBBBBBBBBBBBBBBBB");
                 var user = await _userManager.FindByEmailAsync(Input.Email);
                 string username = "";
                 if (user != null)

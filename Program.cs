@@ -36,9 +36,11 @@ builder.Services.AddScoped<IAuthorizationHandler,
                       GuestAuthorizationHandler>();
 
 builder.Services.Configure<AzureBlobOptions>(builder.Configuration.GetSection("AzureBlob"));
+
 // Image service for handling communication with azure blob
 builder.Services.AddTransient<IImageService, ImageService>();
-
+// Album delete service for handling the deletion of albums when user is deleted
+builder.Services.AddTransient<IAlbumDeleteService, AlbumDeleteService>();
 
 builder.Services.Configure<IdentityOptions>(options =>
 {

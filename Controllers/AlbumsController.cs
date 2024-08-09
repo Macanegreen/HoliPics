@@ -99,7 +99,10 @@ namespace HoliPics.Controllers
                 album.CreationTime = CreationTime;
                 album.Thumbnail = "placeholder.png";
 
-                _context.Add(album);
+                var owner = await _userManager.FindByIdAsync(album.CreatorId);                
+                _context.Add(album);                
+                await _context.SaveChangesAsync();
+                owner.Albums.Add(album.Id);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -203,6 +206,8 @@ namespace HoliPics.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+            
+            Console.WriteLine(Request.Headers.Referer.ToString());
             var album = await _context.Albums.FindAsync(id);
             // Check is current user is authorized to delete the given album
             var permissionResult = await CheckPermission(album, AlbumOperations.Delete);
