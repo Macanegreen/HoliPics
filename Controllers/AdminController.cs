@@ -88,5 +88,16 @@ namespace HoliPics.Controllers
             return RedirectToAction(nameof(Overview));
         }
 
+
+        
+        public async Task<IActionResult> TestEmailSender([FromServices] IEmailSenderService emailSenderService)
+        {
+            Console.WriteLine("LLLLLLLLLLLLLLLLLL");
+            var subject = "test";
+            var body = "this is a test";
+            var toAddress = "mikkel.m.joergensen@outlook.dk";
+            await emailSenderService.SendEmailAsync(toAddress, subject, body);
+            return RedirectToAction(nameof(Overview));
+        }
     }
 }

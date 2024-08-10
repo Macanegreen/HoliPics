@@ -6,6 +6,7 @@ using System;
 using System.Text;
 using System.Threading.Tasks;
 using HoliPics.Areas.Identity.Data;
+using HoliPics.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -19,9 +20,9 @@ namespace HoliPics.Areas.Identity.Pages.Account
     public class RegisterConfirmationModel : PageModel
     {
         private readonly UserManager<HoliPicsUser> _userManager;
-        private readonly IEmailSender _sender;
+        private readonly IEmailSenderService _sender;
 
-        public RegisterConfirmationModel(UserManager<HoliPicsUser> userManager, IEmailSender sender)
+        public RegisterConfirmationModel(UserManager<HoliPicsUser> userManager, IEmailSenderService sender)
         {
             _userManager = userManager;
             _sender = sender;
@@ -61,7 +62,7 @@ namespace HoliPics.Areas.Identity.Pages.Account
 
             Email = email;
             // Once you add a real email sender, you should remove this code that lets you confirm the account
-            DisplayConfirmAccountLink = true;
+            DisplayConfirmAccountLink = false;
             if (DisplayConfirmAccountLink)
             {
                 var userId = await _userManager.GetUserIdAsync(user);

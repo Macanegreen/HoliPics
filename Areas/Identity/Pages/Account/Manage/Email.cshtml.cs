@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using HoliPics.Areas.Identity.Data;
+using HoliPics.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +21,12 @@ namespace HoliPics.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<HoliPicsUser> _userManager;
         private readonly SignInManager<HoliPicsUser> _signInManager;
-        private readonly IEmailSender _emailSender;
+        private readonly IEmailSenderService _emailSender;
 
         public EmailModel(
             UserManager<HoliPicsUser> userManager,
             SignInManager<HoliPicsUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSenderService emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;

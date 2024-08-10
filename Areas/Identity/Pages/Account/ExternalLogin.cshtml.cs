@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using HoliPics.Areas.Identity.Data;
+using HoliPics.Services.Interfaces;
 
 namespace HoliPics.Areas.Identity.Pages.Account
 {
@@ -28,7 +29,7 @@ namespace HoliPics.Areas.Identity.Pages.Account
         private readonly UserManager<HoliPicsUser> _userManager;
         private readonly IUserStore<HoliPicsUser> _userStore;
         private readonly IUserEmailStore<HoliPicsUser> _emailStore;
-        private readonly IEmailSender _emailSender;
+        private readonly IEmailSenderService _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
@@ -36,7 +37,7 @@ namespace HoliPics.Areas.Identity.Pages.Account
             UserManager<HoliPicsUser> userManager,
             IUserStore<HoliPicsUser> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IEmailSenderService emailSender)
         {
             _signInManager = signInManager;
             _userManager = userManager;

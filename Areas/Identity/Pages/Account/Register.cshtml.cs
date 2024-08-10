@@ -11,6 +11,7 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 using HoliPics.Areas.Identity.Data;
+using HoliPics.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -29,7 +30,7 @@ namespace HoliPics.Areas.Identity.Pages.Account
         private readonly IUserStore<HoliPicsUser> _userStore;
         private readonly IUserEmailStore<HoliPicsUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
-        private readonly IEmailSender _emailSender;
+        private readonly IEmailSenderService _emailSender;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
@@ -37,7 +38,7 @@ namespace HoliPics.Areas.Identity.Pages.Account
             IUserStore<HoliPicsUser> userStore,
             SignInManager<HoliPicsUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender,
+            IEmailSenderService emailSender,
             RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;

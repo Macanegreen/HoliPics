@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,17 @@ builder.Services.Configure<AzureBlobOptions>(builder.Configuration.GetSection("A
 builder.Services.AddTransient<IImageService, ImageService>();
 // Album delete service for handling the deletion of albums when user is deleted
 builder.Services.AddTransient<IAlbumDeleteService, AlbumDeleteService>();
+// Email sender service for handling the email confirmation
+builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
+builder.Services.Configure<EmailSenderOptions>(options =>
+{
+    options.HostAddress = builder.Configuration["ExternalProviders:MailKit:SMTP:Address"];
+    options.HostPort = Convert.ToInt32(builder.Configuration["ExternalProviders:MailKit:SMTP:Port"]);
+    options.HostUsername = builder.Configuration["ExternalProviders:MailKit:SMTP:Account"];
+    options.HostPassword = builder.Configuration["ExternalProviders:MailKit:SMTP:Password"];
+    options.SenderEmail = builder.Configuration["ExternalProviders:MailKit:SMTP:SenderEmail"];
+    options.SenderName = builder.Configuration["ExternalProviders:MailKit:SMTP:SenderName"];    
+});
 
 builder.Services.Configure<IdentityOptions>(options =>
 {

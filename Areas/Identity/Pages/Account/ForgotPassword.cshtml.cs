@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using HoliPics.Areas.Identity.Data;
+using HoliPics.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -20,9 +21,9 @@ namespace HoliPics.Areas.Identity.Pages.Account
     public class ForgotPasswordModel : PageModel
     {
         private readonly UserManager<HoliPicsUser> _userManager;
-        private readonly IEmailSender _emailSender;
+        private readonly IEmailSenderService _emailSender;
 
-        public ForgotPasswordModel(UserManager<HoliPicsUser> userManager, IEmailSender emailSender)
+        public ForgotPasswordModel(UserManager<HoliPicsUser> userManager, IEmailSenderService emailSender)
         {
             _userManager = userManager;
             _emailSender = emailSender;
