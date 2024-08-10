@@ -5,6 +5,7 @@ using MimeKit;
 using MimeKit.Text;
 using MailKit.Net.Smtp;
 using HoliPics.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace HoliPics.Services.Implementations
 {
@@ -18,12 +19,12 @@ namespace HoliPics.Services.Implementations
             Options = options.Value;
         }
 
-        public Task SendEmailAsync(string email, string subject, string htmlMessage)
+        public async Task<string> SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            return ExecuteSendEmail(email, subject, htmlMessage);
+            return await ExecuteSendEmail(email, subject, htmlMessage);
         }
 
-        public Task ExecuteSendEmail(string sendTo, string subject, string htmlMessage)
+        public async Task<string> ExecuteSendEmail(string sendTo, string subject, string htmlMessage)
         {
             var email = new MimeMessage();
             email.Sender = MailboxAddress.Parse(Options.SenderEmail); 
@@ -38,13 +39,13 @@ namespace HoliPics.Services.Implementations
 
             using (var smtpClient = new SmtpClient())
             {
-                smtpClient.Connect(Options.HostAddress, Options.HostPort, Options.HostSecureSocketOptions);
-                smtpClient.Authenticate(Options.HostUsername, Options.HostPassword);
-                smtpClient.Send(email);
-                smtpClient.Disconnect(true);
+                await smtpClient.ConnectAsync(Options.HostAddress, Options.HostPort, Options.HostSecureSocketOptions);
+                await smtpClient.AuthenticateAsync(Options.HostUsername, Options.HostPassword);
+                await smtpClient.SendAsync(email);
+                await smtpClient.DisconnectAsync(true);
             }
 
-            return Task.FromResult(true);
+            return "";
         }
     }
 }
