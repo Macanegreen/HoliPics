@@ -43,7 +43,12 @@ builder.Services.AddTransient<IImageService, ImageService>();
 // Album delete service for handling the deletion of albums when user is deleted
 builder.Services.AddTransient<IAlbumDeleteService, AlbumDeleteService>();
 // Email sender service for handling the email confirmation
-builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
+}
+else { builder.Services.AddTransient<IEmailSenderService, AzureEmailSenderService>(); }
+
 builder.Services.Configure<EmailSenderOptions>(options =>
 {
     options.HostAddress = builder.Configuration["ExternalProviders:MailKit:SMTP:Address"];
@@ -53,6 +58,9 @@ builder.Services.Configure<EmailSenderOptions>(options =>
     options.SenderEmail = builder.Configuration["ExternalProviders:MailKit:SMTP:SenderEmail"];
     options.SenderName = builder.Configuration["ExternalProviders:MailKit:SMTP:SenderName"];    
 });
+
+builder.Services.Configure<AzureEmailSenderOptions>(builder.Configuration.GetSection("AzureEmailService"));
+
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
