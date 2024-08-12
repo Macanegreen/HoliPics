@@ -6,3 +6,24 @@
     <h1 class="display-4">Welcome</h1>
     <p>Welcome to HoliPics.</p>
 </div>
+
+
+<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        @{
+            string firstImg = "holipics-bg-img1.jpg";
+        }
+        <div class="carousel-item active text-center">
+            <img src="/album/GetImage?filename=@firstImg" class="home-bg ignore-padding-top d-block w-100" asp-append-version="true" />
+        </div>
+        @for (int noImgs = 2; noImgs < 6; noImgs ++)
+        {
+            string imgName = "holipics-bg-img" + noImgs.ToString() + ".jpg";
+            <div class="carousel-item text-center">
+                <img src="/album/GetImage?filename=@imgName" class="home-bg ignore-padding-top d-block w-100" loading="lazy" asp-append-version="true" />
+            </div>
+        }
+        
+    </div>
+    
+</div>

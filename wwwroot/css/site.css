@@ -35,6 +35,12 @@ body {
     transform: translateX(-50%);
 }
 
+.home-bg {
+    width: 100vw;
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+
 .ignore-padding-top {
     margin-top: -1rem !important;
 }

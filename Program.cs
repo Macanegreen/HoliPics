@@ -47,7 +47,7 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
 }
-else { builder.Services.AddTransient<IEmailSenderService, AzureEmailSenderService>(); }
+else { builder.Services.AddTransient<IEmailSenderService, MailtrapEmailSenderService>(); }
 
 builder.Services.Configure<EmailSenderOptions>(options =>
 {
@@ -59,7 +59,7 @@ builder.Services.Configure<EmailSenderOptions>(options =>
     options.SenderName = builder.Configuration["ExternalProviders:MailKit:SMTP:SenderName"];    
 });
 
-builder.Services.Configure<AzureEmailSenderOptions>(builder.Configuration.GetSection("AzureEmailService"));
+builder.Services.Configure<MailtrapEmailSenderOptions>(builder.Configuration.GetSection("MailtrapEmailService"));
 
 
 builder.Services.Configure<IdentityOptions>(options =>
