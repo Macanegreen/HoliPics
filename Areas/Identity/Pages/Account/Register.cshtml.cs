@@ -145,14 +145,12 @@ namespace HoliPics.Areas.Identity.Pages.Account
                 _logger.LogInformation("Sets role.");
                 if (Input.Username == "Admin")
                 {                    
-                    var role = new IdentityRole("Admin");
-                    await _roleManager.CreateAsync(role);
+                    var role = new IdentityRole("Admin");                    
                     await _userManager.AddToRoleAsync(user, "Admin");
                 }
                 else
                 {
-                    var role = new IdentityRole("Guest");
-                    await _roleManager.CreateAsync(role);
+                    var role = new IdentityRole("Guest");                    
                     await _userManager.AddToRoleAsync(user, "Guest");
                 }
                 _logger.LogInformation("Checks if user was successfully created.");
