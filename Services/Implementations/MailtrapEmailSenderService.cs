@@ -75,25 +75,14 @@ namespace HoliPics.Services.Implementations
             //}
 
 
-
-            //var client = new SmtpClient("live.smtp.mailtrap.io", 587)
-            //{
-            //    Credentials = new NetworkCredential("api", "5c897497c7d0369a7c8ac9e5eb0b392d"),
-            //    EnableSsl = true
-            //};
-            //client.Send("mailtrap@holipics.net", "holipics.app@gmail.com", "Hello world", "testbody");
-            //System.Console.WriteLine("Sent");
-
-            //var message  = new System.Net.Mail.MailMessage(Options.From, sendTo);
-            //message.Subject = subject;
-            //message.IsBodyHtml = true;
-            //message.Body = htmlMessage;
-            //var smtp = new System.Net.Mail.SmtpClient("live.smtp.mailtrap.io", 587);
-            //smtp.EnableSsl = true;
-            //smtp.Credentials = new System.Net.NetworkCredential("api", Options.ApiToken);
-            //smtp.Send(message);
-
-
+            var message = new System.Net.Mail.MailMessage(Options.From, sendTo);
+            message.Subject = subject;
+            message.IsBodyHtml = true;
+            message.Body = htmlMessage;
+            var smtp = new System.Net.Mail.SmtpClient("live.smtp.mailtrap.io", 587);
+            smtp.EnableSsl = true;
+            smtp.Credentials = new System.Net.NetworkCredential("api", Options.ApiToken);
+            smtp.Send(message);
 
             return "";
         }
