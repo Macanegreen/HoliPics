@@ -143,16 +143,7 @@ namespace HoliPics.Areas.Identity.Pages.Account
                 _logger.LogInformation("Tries to create the user.");
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 _logger.LogInformation("Sets role.");
-                if (Input.Username == "Admin")
-                {                    
-                    var role = new IdentityRole("Admin");                    
-                    await _userManager.AddToRoleAsync(user, "Admin");
-                }
-                else
-                {
-                    var role = new IdentityRole("Guest");                    
-                    await _userManager.AddToRoleAsync(user, "Guest");
-                }
+                await _userManager.AddToRoleAsync(user, "Guest");
                 _logger.LogInformation("Checks if user was successfully created.");
                 if (result.Succeeded)
                 {
@@ -166,9 +157,9 @@ namespace HoliPics.Areas.Identity.Pages.Account
                         pageHandler: null,
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
-
-                    //await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                    //    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    _logger.LogInformation("Tries to send confirmation email.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
+                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
