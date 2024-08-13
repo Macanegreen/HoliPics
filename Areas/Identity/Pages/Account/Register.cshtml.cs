@@ -123,11 +123,13 @@ namespace HoliPics.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
             returnUrl ??= Url.Content("~/");
+            _logger.LogInformation("OnPost action begun.");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
                 user.Name = Input.Name;
+                _logger.LogInformation("Tries to set username in userstore.");
                 if (Input.Username == null)
                 {
                     await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
@@ -136,10 +138,11 @@ namespace HoliPics.Areas.Identity.Pages.Account
                 {
                     await _userStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);                    
                 }
-
-                    await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                _logger.LogInformation("Tries to se email in emailstore.");
+                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                _logger.LogInformation("Tries to create the user.");
                 var result = await _userManager.CreateAsync(user, Input.Password);
-
+                _logger.LogInformation("Sets role.");
                 if (Input.Username == "Admin")
                 {                    
                     var role = new IdentityRole("Admin");
@@ -152,7 +155,7 @@ namespace HoliPics.Areas.Identity.Pages.Account
                     await _roleManager.CreateAsync(role);
                     await _userManager.AddToRoleAsync(user, "Guest");
                 }
-
+                _logger.LogInformation("Checks if user was successfully created.");
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");

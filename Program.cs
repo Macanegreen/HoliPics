@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.AzureAppServices;
 using System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,7 +48,11 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddTransient<IEmailSenderService, EmailSenderService>();
 }
-else { builder.Services.AddTransient<IEmailSenderService, MailtrapEmailSenderService>(); }
+else
+{ 
+    builder.Services.AddTransient<IEmailSenderService, MailtrapEmailSenderService>();
+    builder.Logging.AddAzureWebAppDiagnostics();
+}
 
 builder.Services.Configure<EmailSenderOptions>(options =>
 {
