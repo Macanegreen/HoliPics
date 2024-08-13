@@ -1,11 +1,13 @@
 
 html {
-  font-size: 14px;
+    font-size: 14px;
+    
 }
 
 @media (min-width: 768px) {
   html {
     font-size: 16px;
+    
   }
 }
 
@@ -14,14 +16,20 @@ html {
 }
 
 html {
-  position: relative;
-  min-height: 100%;
-  overflow-x: hidden;
+    position: relative;
+    min-height: 100%;
+    overflow-x: hidden;
+    color: white;
 }
 
 body {
     margin-bottom: 60px;
+    background-image: url('/album/GetImage?filename=blurr-bg-img5.png');
+    background-size: cover;
+    color: white;
 }
+
+
 
 .closeup {
     max-height: calc(100vh - 300px);
@@ -36,9 +44,15 @@ body {
 }
 
 .home-bg {
+    margin-top: -1rem;
     width: 100vw;
     margin-left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-50%);   
+    z-index: -1;
+}
+
+#primaryNavbar {
+    background-color: rgba(0, 0, 0, 0.4);    
 }
 
 .ignore-padding-top {

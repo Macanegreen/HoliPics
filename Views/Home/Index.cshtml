@@ -2,28 +2,32 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Welcome to HoliPics.</p>
+<style>
+    
+</style>
+
+<div class="navbar-header text-center" style="z-index: 1;">
+    <h1 class="display-4">Welcome to HoliPics</h1>
+
 </div>
 
-
-<div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+<div id="carouselExampleAutoplaying" class="carousel slide carousel-fade home-bg" data-bs-ride="carousel">
     <div class="carousel-inner">
         @{
             string firstImg = "holipics-bg-img1.jpg";
         }
         <div class="carousel-item active text-center">
-            <img src="/album/GetImage?filename=@firstImg" class="home-bg ignore-padding-top d-block w-100" asp-append-version="true" />
+            <img src="/album/GetImage?filename=@firstImg" class="home-bg" asp-append-version="true" />
         </div>
         @for (int noImgs = 2; noImgs < 6; noImgs ++)
         {
             string imgName = "holipics-bg-img" + noImgs.ToString() + ".jpg";
             <div class="carousel-item text-center">
-                <img src="/album/GetImage?filename=@imgName" class="home-bg ignore-padding-top d-block w-100" loading="lazy" asp-append-version="true" />
+                <img src="/album/GetImage?filename=@imgName" class="home-bg" loading="lazy" asp-append-version="true" />
             </div>
         }
         
     </div>
     
 </div>
+
