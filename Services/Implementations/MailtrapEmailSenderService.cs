@@ -14,6 +14,7 @@ using RestSharp;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+
 namespace HoliPics.Services.Implementations
 {
     public class MailtrapEmailSenderService : IEmailSenderService
@@ -34,25 +35,64 @@ namespace HoliPics.Services.Implementations
         public async Task<string> ExecuteSendEmail(string sendTo, string subject, string htmlMessage)
         {
 
-            var to = new { email = sendTo };
-            var from = new { email = Options.From, name = "Mailtrap Test" };
-            var args = new
-            {
-                from = from,
-                to = new[] { to },
-                subject = "You are awesome",
-                text = "Congrats for sending your first email with Mailtrap!",
-                category = "Integration Test"
-            };           
+            //var to = new { email = sendTo };
+            //var from = new { email = Options.From, name = "Mailtrap Test" };
+            //var args = new
+            //{
+            //    from = from,
+            //    to = new[] { to },
+            //    subject = "You are awesome",
+            //    text = "Congrats for sending your first email with Mailtrap!",
+            //    category = "Integration Test"
+            //};           
 
-            var client = new RestClient("https://send.api.mailtrap.io/api/send");
-            var request = new RestRequest();
-            request.AddHeader("Authorization", "Bearer " + Options.ApiToken);
-            request.AddHeader("Content-Type", "application/json");
-            request.AddParameter("application/json",
-            JsonSerializer.Serialize(args), ParameterType.RequestBody);
-            var response = client.Post(request);
-            Console.WriteLine(response.Content);
+            //var client = new RestClient("https://send.api.mailtrap.io/api/send");
+            //var request = new RestRequest();
+            //request.AddHeader("Authorization", "Bearer " + Options.ApiToken);
+            //request.AddHeader("Content-Type", "application/json");
+            //request.AddParameter("application/json",
+            //JsonSerializer.Serialize(args), ParameterType.RequestBody);
+            //var response = client.Post(request);
+            //Console.WriteLine(response.Content);
+
+            //var email = new MimeMessage();
+            //email.Sender = MailboxAddress.Parse(Options.);
+            //if (!string.IsNullOrEmpty(Options.SenderName))
+            //{
+            //    email.Sender.Name = Options.SenderName;
+            //}
+            //email.From.Add(email.Sender);
+            //email.To.Add(MailboxAddress.Parse(sendTo));
+            //email.Subject = subject;
+            //email.Body = new TextPart(TextFormat.Html) { Text = htmlMessage };
+
+            //using (var smtpClient = new SmtpClient())
+            //{
+            //    await smtpClient.ConnectAsync(Options.HostAddress, Options.HostPort, Options.HostSecureSocketOptions);
+            //    await smtpClient.AuthenticateAsync(Options.HostUsername, Options.HostPassword);
+            //    await smtpClient.SendAsync(email);
+            //    await smtpClient.DisconnectAsync(true);
+            //}
+
+
+
+            //var client = new SmtpClient("live.smtp.mailtrap.io", 587)
+            //{
+            //    Credentials = new NetworkCredential("api", "5c897497c7d0369a7c8ac9e5eb0b392d"),
+            //    EnableSsl = true
+            //};
+            //client.Send("mailtrap@holipics.net", "holipics.app@gmail.com", "Hello world", "testbody");
+            //System.Console.WriteLine("Sent");
+
+            var message  = new System.Net.Mail.MailMessage(Options.From, sendTo);
+            message.Subject = subject;
+            message.IsBodyHtml = true;
+            message.Body = htmlMessage;
+            var smtp = new System.Net.Mail.SmtpClient("live.smtp.mailtrap.io");
+            smtp.EnableSsl = true;
+            smtp.Credentials = new System.Net.NetworkCredential("api", Options.ApiToken);
+            smtp.Send(message);
+
 
 
             return "";
