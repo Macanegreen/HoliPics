@@ -84,14 +84,14 @@ namespace HoliPics.Services.Implementations
             //client.Send("mailtrap@holipics.net", "holipics.app@gmail.com", "Hello world", "testbody");
             //System.Console.WriteLine("Sent");
 
-            var message  = new System.Net.Mail.MailMessage(Options.From, sendTo);
-            message.Subject = subject;
-            message.IsBodyHtml = true;
-            message.Body = htmlMessage;
-            var smtp = new System.Net.Mail.SmtpClient("live.smtp.mailtrap.io", 587);
-            smtp.EnableSsl = true;
-            smtp.Credentials = new System.Net.NetworkCredential("api", Options.ApiToken);
-            smtp.Send(message);
+            //var message  = new System.Net.Mail.MailMessage(Options.From, sendTo);
+            //message.Subject = subject;
+            //message.IsBodyHtml = true;
+            //message.Body = htmlMessage;
+            //var smtp = new System.Net.Mail.SmtpClient("live.smtp.mailtrap.io", 587);
+            //smtp.EnableSsl = true;
+            //smtp.Credentials = new System.Net.NetworkCredential("api", Options.ApiToken);
+            //smtp.Send(message);
 
 
 
