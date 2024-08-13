@@ -140,14 +140,16 @@ namespace HoliPics.Areas.Identity.Pages.Account
                 }
                 _logger.LogInformation("Tries to se email in emailstore.");
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                
                 _logger.LogInformation("Tries to create the user.");
-                var result = await _userManager.CreateAsync(user, Input.Password);
-                _logger.LogInformation("Sets role.");
-                await _userManager.AddToRoleAsync(user, "Guest");
+                var result = await _userManager.CreateAsync(user, Input.Password);                
+
                 _logger.LogInformation("Checks if user was successfully created.");
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("Tries to set role.");
+                    await _userManager.AddToRoleAsync(user, "Guest");
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
