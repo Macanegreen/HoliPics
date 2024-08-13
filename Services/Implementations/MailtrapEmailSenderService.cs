@@ -88,7 +88,7 @@ namespace HoliPics.Services.Implementations
             message.Subject = subject;
             message.IsBodyHtml = true;
             message.Body = htmlMessage;
-            var smtp = new System.Net.Mail.SmtpClient("live.smtp.mailtrap.io");
+            var smtp = new System.Net.Mail.SmtpClient("live.smtp.mailtrap.io", 587);
             smtp.EnableSsl = true;
             smtp.Credentials = new System.Net.NetworkCredential("api", Options.ApiToken);
             smtp.Send(message);
