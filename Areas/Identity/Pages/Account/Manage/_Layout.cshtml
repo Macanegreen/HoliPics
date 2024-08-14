@@ -9,20 +9,27 @@
     }
 }
 
-<h1>Manage your account</h1>
-
 <div>
+    <h1>Manage your account</h1>
     <h2>Change your account settings</h2>
-    <hr />
-    <div class="row">
-        <div class="col-md-3">
-            <partial name="_ManageNav" />
+    
+    <div style="background-color: rgba(0,0,0,0.5)">    
+        <hr />
+        <div class="row">
+            <div class="col-md-3">
+                <partial name="_ManageNav" />
+            </div>
+            <div class="col-md-9">
+                @RenderBody()
+            </div>
         </div>
-        <div class="col-md-9">
-            @RenderBody()
+        <div style="height: 50vw">
+
         </div>
     </div>
 </div>
+
+
 
 @section Scripts {
     @RenderSection("Scripts", required: false)

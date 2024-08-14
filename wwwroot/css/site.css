@@ -26,6 +26,7 @@ body {
     margin-bottom: 60px;
     background-image: url('/album/GetImage?filename=blurr-bg-img5.png');
     background-size: cover;
+    background-attachment: fixed;
     color: white;
 }
 

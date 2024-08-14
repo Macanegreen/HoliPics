@@ -11,7 +11,7 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            <p>@Html.DisplayNameFor(model => model.Name)</p>
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Name)
@@ -20,15 +20,22 @@
             @Html.DisplayNameFor(model => model.Description)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
+            @if (string.IsNullOrEmpty(Model.Description))
+            {
+                <p><i>No description</i></p>
+            }
+            else
+            {
+                Html.DisplayFor(model => model.Description);                 
+            }
         <dt class="col-sm-2">
-            Number of pictures
+            <p>Number of pictures</p>
         </dt>
         <dd class="col-sm-10">
             @Model.ImageCount()
         </dd>        
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.CreationTime)
+            <p>@Html.DisplayNameFor(model => model.CreationTime)</p>
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.CreationTime)
@@ -42,6 +49,6 @@
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a class="text-info" asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a class="text-info" asp-action="Index">Back to List</a>
 </div>

@@ -17,13 +17,13 @@
             string firstImg = "holipics-bg-img1.jpg";
         }
         <div class="carousel-item active text-center">
-            <img src="/album/GetImage?filename=@firstImg" class="home-bg" asp-append-version="true" />
+            <img src="~/images/@firstImg" class="home-bg" asp-append-version="true" />
         </div>
         @for (int noImgs = 2; noImgs < 6; noImgs ++)
         {
             string imgName = "holipics-bg-img" + noImgs.ToString() + ".jpg";
             <div class="carousel-item text-center">
-                <img src="/album/GetImage?filename=@imgName" class="home-bg" loading="lazy" asp-append-version="true" />
+                <img src="~/images/@imgName" class="home-bg" loading="lazy" asp-append-version="true" />
             </div>
         }
         
