@@ -149,7 +149,7 @@ namespace HoliPics.Controllers
                     var original = await _context.Albums.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
 
                     // Check is current user is authorized to edit the given album
-                    var permissionResult = await CheckPermission(album, AlbumOperations.Update);
+                    var permissionResult = await CheckPermission(original, AlbumOperations.Update);
                     if (permissionResult is not OkResult) { return permissionResult; }
 
                     // Assign the original unchanged properties to the new album

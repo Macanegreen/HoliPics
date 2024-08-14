@@ -46,13 +46,15 @@ namespace HoliPics.Authorization
             }
 
             if (resource.CreatorId == _userManager.GetUserId(context.User))
-            {
+            {                
                 _logger.LogInformation("Current user is owner of requested album");                                
                 context.Succeed(requirement);
             }
             // Don't allow users to access albums they do not own.
             else
             {
+                Console.WriteLine(resource.CreatorId);
+                Console.WriteLine(_userManager.GetUserId(context.User));
                 _logger.LogInformation("Current user is NOT the owner of requested album");
                 context.Fail();
                 return Task.CompletedTask;
