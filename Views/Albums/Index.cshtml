@@ -23,7 +23,7 @@
             @if ((await AuthorizationService.AuthorizeAsync(User, item, AlbumOperations.Read)).Succeeded)
             {
                 <div class="col">
-                    <div class="card">
+                    <div class="card" style="background-color: rgba(255,255,255,0.8)">
                         <a class="link" asp-area="" asp-controller="Album" asp-action="Index" asp-route-id="@item.Id">
                             <img src="/album/GetImage?filename=@item.Thumbnail" class="card-img-top thumbnail" />
                         </a>
