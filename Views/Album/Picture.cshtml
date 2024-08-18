@@ -20,12 +20,11 @@
         <div class="navbar justify-content-between">
             <ul class="navbar-nav flex-grow-1">
                 <li class="nav-item">
-                    <form asp-action="SetThumbnail">
-                        <input type="hidden" asp-for="@Model.Id" />
-                        <button type="submit" class="btn btn-link text-white rounded-circle">
-                            <i class="bi bi-card-image h4"></i>
-                        </button> |
-                    </form>
+                    
+                    <button type="button" class="btn btn-link text-white rounded-circle" id="liveAlertBtn" onclick="setPlaceholder()" data-bs-toggle="tooltip"
+                    data-bs-title="Set as thumbnail" data-bs-placement="bottom">
+                        <i class="bi bi-card-image h4"></i>
+                    </button>
                 </li>
                 <li class="nav-item">
                     <button type="button" class="btn btn-link text-white rounded-circle" data-bs-toggle="modal" data-bs-target="#deleteImage">
@@ -38,8 +37,11 @@
     </div>
 </nav>
 
+<div id="liveAlertPlaceholder"></div>
+
+
 @{
-    string imgName = $"Large_{Model.FileName}";
+    string imgName = $"Large_{Model.FileName}";    
 }
 <div class="text-center">
     <img src="/album/GetImage?filename=@imgName" class="closeup" />
@@ -67,3 +69,40 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        function setPlaceholder() {
+            $.post(
+                "/Album/SetThumbnail/" + @Model.Id
+                        );
+        }
+
+        const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
+        const appendAlert = (message, type) => {
+            const wrapper = document.createElement('div')
+            wrapper.innerHTML = [
+                `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+                `   <div>${message}</div>`,
+                '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+                '</div>'
+            ].join('')
+
+            alertPlaceholder.append(wrapper)
+        }
+
+        const alertTrigger = document.getElementById('liveAlertBtn')
+        if (alertTrigger) {
+            alertTrigger.addEventListener('click', () => {
+                appendAlert('<i class="bi bi-check-circle-fill"></i> Thumbnail updated!', 'success')
+            })
+
+        }
+    </script>
+
+    <script type="text/javascript">
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    </script>
+}

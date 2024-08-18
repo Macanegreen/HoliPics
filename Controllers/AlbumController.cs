@@ -172,20 +172,20 @@ namespace HoliPics.Controllers
             }
             var permissionResult = await CheckPermission(album, AlbumOperations.Read);
             if (permissionResult is not OkResult) { return permissionResult; }
-
+          
             return View(image);
         }
 
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SetThumbnail(string id)
-        {
+        [Authorize]        
+        public async Task<IActionResult> SetThumbnail(int id)
+        {            
             if (id == null)
             {
                 return NotFound();
             }
-            var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == id);
+            var image = await _context.Images.FirstOrDefaultAsync(im => im.Id == id);
             var album = await _context.Albums.FindAsync(image.AlbumId);
             var permissionResult = await CheckPermission(album, AlbumOperations.Update);
             if (permissionResult is not OkResult) { return permissionResult; }
@@ -198,7 +198,7 @@ namespace HoliPics.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index), new { id = image.AlbumId });
+            return RedirectToAction(nameof(Picture), new {id = image.FileName});
         }
 
 
