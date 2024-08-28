@@ -10,61 +10,82 @@
 }
 @if ((await AuthorizationService.AuthorizeAsync(User, Model, AlbumOperations.Read)).Succeeded)
 {
-    <nav class="navbar navbar-expand full-bleed ignore-padding-top sticky-top"
-        style="background-color: rgba(0,0,0,0.5)">
-        <div class="container-fluid">
+   <style>
+        .dropdown-item:active {
+            background-color: black;           
+        }
+        .dropdown-menu {
+            min-width: 1rem;
+        }
+   </style>
+
+
+    <nav class="navbar navbar-expand navbar-toggleable-sm navbar-dark box-shadow mb-3 full-bleed ignore-padding-top sticky-top" style="background-color: rgba(0,0,0,0.5)">        
+        <div class="container-fluid">           
             <div class="navbar">
-                <a asp-area="" asp-action="Index" asp-controller="Albums" class="btn pmd-ripple-effect btn-dark pmd-btn-flat rounded-circle" type="button">
+                <a asp-area="" asp-action="Index" asp-controller="Albums" class="btn btn-dark rounded-circle" type="button">
                     <i class="bi bi-arrow-left-short h3"></i>
                 </a>
             </div>
+
             <div class="navbar-header">
                 <h1 class="display-4">@Model.Name</h1>
             </div>
-            <div class="navbar center-right">
-                <a asp-action="Upload" asp-route-id="@Model.Id" class="btn pmd-ripple-effect btn-dark text-info pmd-btn-flat rounded-circle" type="button">
-                    <i class="bi bi-plus-square-dotted h4"></i>
-                </a>
-            </div>
-            <div class="navbar justify-content-between">
-                <ul class="navbar-nav flex-grow-1">                    
+                                  
+            
+            <div class="navbar d-sm-inline-flex justify-content-between" id="test">                
+                <ul class="navbar-nav flex-grow-1">   
                     <li class="nav-item">
+                        <a asp-action="Upload" asp-route-id="@Model.Id" class="btn btn-dark rounded-circle" type="button">
+                            <i class="bi bi-plus-square-dotted h4"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <button class="nav-link dropdown-toggle text-white" id="displayDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-columns-gap h5" id="default-active"></i>
+                            <i class="bi bi-grid-3x3-gap h5" id="info-active"></i>
+                            <i class="bi bi-images h5" id="focus-active"></i>
+                        </button>
                         <form onchange="changeDisplay()">
-                            <div class="btn-group" role="group">
-                                <input type="radio" class="btn-check" name="btnradio" value="default" id="default-btn" autocomplete="off" checked />
-                                <label class="btn btn-outline-info" for="default-btn">
-                                    <i class="bi bi-columns-gap h5"></i>
-                                </label>
-
-                                <input type="radio" class="btn-check" name="btnradio" value="info" id="info-btn" autocomplete="off" />
-                                <label class="btn btn-outline-info" for="info-btn">
-                                    <i class="bi bi-grid-3x3-gap h5"></i>
-                                </label>
-
-                                <input type="radio" class="btn-check" name="btnradio" value="focus" id="focus-btn" autocomplete="off" />
-                                <label class="btn btn-outline-info" for="focus-btn">
-                                    <i class="bi bi-images h5"></i>
-                                </label>
-                            </div>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="displayDropdown" data-bs-theme="dark">
+                                <li class="dropdown-item">
+                                    <input type="radio" class="btn-check" name="btnradio" value="default" id="default-btn" autocomplete="off" checked />
+                                    <label class="btn btn-outline-info" for="default-btn">
+                                        <i class="bi bi-columns-gap h5"></i>
+                                    </label>
+                                </li>
+                                <li class="dropdown-item">
+                                    <input type="radio" class="btn-check" name="btnradio" value="info" id="info-btn" autocomplete="off" />
+                                    <label class="btn btn-outline-info" for="info-btn">
+                                        <i class="bi bi-grid-3x3-gap h5"></i>
+                                    </label>
+                                </li>
+                                <li class="dropdown-item">
+                                    <input type="radio" class="btn-check" name="btnradio" value="focus" id="focus-btn" autocomplete="off" />
+                                    <label class="btn btn-outline-info" for="focus-btn">
+                                        <i class="bi bi-images h5"></i>
+                                    </label>
+                                </li>
+                            </ul>
                         </form>
+                        
                     </li>
                 </ul>
-
             </div>
         </div>
     </nav>
 
 
     <div id="default-display">
-        @await Html.PartialAsync("DefaultDisplayPartial", Model)
+        @await Html.PartialAsync("DefaultDisplayPartial", Model, ViewData)
     </div>
 
     <div id="info-display">
-        @await Html.PartialAsync("InfoDisplayPartial", Model)
+        @await Html.PartialAsync("InfoDisplayPartial", Model, ViewData)
     </div>
 
     <div id="focus-display">
-        @await Html.PartialAsync("FocusDisplayPartial", Model)
+        @await Html.PartialAsync("FocusDisplayPartial", Model, ViewData)
     </div>
 
    
@@ -74,23 +95,35 @@
         <script>
             document.getElementById("default-display").style.display = "inline";
             document.getElementById("info-display").style.display = "none";
+            document.getElementById("info-active").style.display = "none";
             document.getElementById("focus-display").style.display = "none";
+            document.getElementById("focus-active").style.display = "none";
 
             function changeDisplay() {
                 if (document.getElementById("default-btn").checked) {
                     document.getElementById("default-display").style.display = "inline";
+                    document.getElementById("default-active").style.display = "inline";
                     document.getElementById("info-display").style.display = "none";
+                    document.getElementById("info-active").style.display = "none";
                     document.getElementById("focus-display").style.display = "none";
+                    document.getElementById("focus-active").style.display = "none";
+                
                 }
                 else if (document.getElementById("info-btn").checked) {
                     document.getElementById("default-display").style.display = "none";
+                    document.getElementById("default-active").style.display = "none";
                     document.getElementById("info-display").style.display = "inline";
+                    document.getElementById("info-active").style.display = "inline";
                     document.getElementById("focus-display").style.display = "none";
+                    document.getElementById("focus-active").style.display = "none";
                 }
                 else if (document.getElementById("focus-btn").checked) {
                     document.getElementById("default-display").style.display = "none";
+                    document.getElementById("default-active").style.display = "none";
                     document.getElementById("info-display").style.display = "none";
+                    document.getElementById("info-active").style.display = "none";
                     document.getElementById("focus-display").style.display = "inline";
+                    document.getElementById("focus-active").style.display = "inline";
                 }
             }
   

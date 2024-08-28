@@ -5,15 +5,16 @@ using HoliPics.VievModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Linq;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using HoliPics.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using HoliPics.Areas.Identity.Data;
+using MetadataExtractor;
+using MetadataExtractor.Formats.Exif;
+using System.Globalization;
+using System.Collections.Generic;
+
 
 namespace HoliPics.Controllers
 {
@@ -26,9 +27,10 @@ namespace HoliPics.Controllers
         private readonly IImageService _imageService;   
         private readonly UserManager<HoliPicsUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger<AlbumController> _logger;
 
-        public AlbumController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<HoliPicsUser> userManager, RoleManager<IdentityRole> roleManager)
-            : base(context, webHostEnvironment, authorizationService, imageService, userManager, roleManager)
+        public AlbumController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<HoliPicsUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<AlbumController> logger)
+            : base(context, webHostEnvironment, authorizationService, imageService, userManager, roleManager, logger)
         {
             _context = context;
             _authorizationService = authorizationService;
@@ -42,6 +44,7 @@ namespace HoliPics.Controllers
             _imageService = imageService;
             _userManager = userManager;
             _roleManager = roleManager;
+            _logger = logger;
         }
 
 
@@ -52,7 +55,26 @@ namespace HoliPics.Controllers
             var album = await _context.Albums.FindAsync(id);
             var permissionResult = await CheckPermission(album, AlbumOperations.Read);
             if (permissionResult is not OkResult) { return permissionResult; }
+            ViewData["ImagesSortedByDate"] = await SortedByDate(album.Images);
             return View(album);
+        }
+
+        private async Task<SortedDictionary<DateTime, List<string>>> SortedByDate(List<string> fileNames)
+        {
+            SortedDictionary < DateTime, List<string> > sortedByDate = new SortedDictionary<DateTime, List<string>>();
+            foreach (var fileName in fileNames)
+            {
+                var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == fileName);
+                if (image == null) { continue; }
+                // Add new (Key, Value) pair if key does not exist.
+                if (!sortedByDate.TryGetValue(image.DateTaken.Date, out List<string>? imageNames))
+                {
+                    imageNames = new List<string>();
+                    sortedByDate.Add(image.DateTaken.Date, imageNames);
+                }
+                imageNames.Add(fileName);
+            }            
+            return sortedByDate;
         }
 
         public IActionResult Upload(int id)
@@ -77,14 +99,16 @@ namespace HoliPics.Controllers
                 long totalBytes = images.ImageFiles.Sum(f => f.Length);
                 long totalReadBytes = 0;
 
-                List<string> fileNames = new List<string>();
+                List<Img> imgs = new List<Img>();
                 if (images.ImageFiles != null)
                 {
                     foreach (var file in images.ImageFiles)
                     {
                         // Assign a unique identifier to the filename
                         var fileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
-                        fileNames.Add(fileName);
+
+                        Img imageFile = new Img { AlbumId = id, DateTaken = GetDateTime(file.OpenReadStream()), FileName = fileName };
+                        imgs.Add(imageFile);                       
 
                         // Record the upload progress
                         byte[] buffer = new byte[16 * 1024];
@@ -102,7 +126,7 @@ namespace HoliPics.Controllers
                         // Store image in different sizes
                         foreach (KeyValuePair<string, int> size in _imageSizes)
                         {                          
-                            using Image image = Image.Load(file.OpenReadStream());
+                            using Image image = Image.Load(file.OpenReadStream()); 
                             image.Mutate(x => x.Resize(size.Value, 0));
                             
                             // Store the uploaded file in the cloud                            
@@ -112,14 +136,11 @@ namespace HoliPics.Controllers
                         }
                     }
                 }
-
-                foreach (var fileName in fileNames)
-                {
-                    Img imageFile = new Img { AlbumId = id, FileName = fileName };
-
+                album.UploadProgress = 0;
+                foreach (var imageFile in imgs)
+                {       
                     // Add the image filename to the album
-                    album.Images.Add(imageFile.FileName);
-                    album.UploadProgress = 0;
+                    album.Images.Add(imageFile.FileName);                    
 
                     // Track the changes to imagefile and album
                     _context.Add(imageFile);
@@ -144,14 +165,13 @@ namespace HoliPics.Controllers
             return this.Content(album.UploadProgress.ToString());
         }
 
-        
+        [Authorize]
         public async Task<ActionResult> GetImage(string filename)
         {
             (Stream imageStream, string contentType) = await _imageService.GetImageFromBlob(filename);
 
             return File(imageStream, contentType);
-        }
-
+        }     
 
 
         [Authorize]
@@ -180,11 +200,7 @@ namespace HoliPics.Controllers
         [HttpPost]
         [Authorize]        
         public async Task<IActionResult> SetThumbnail(int id)
-        {            
-            if (id == null)
-            {
-                return NotFound();
-            }
+        {        
             var image = await _context.Images.FirstOrDefaultAsync(im => im.Id == id);
             var album = await _context.Albums.FindAsync(image.AlbumId);
             var permissionResult = await CheckPermission(album, AlbumOperations.Update);

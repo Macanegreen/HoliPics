@@ -26,10 +26,11 @@ namespace HoliPics.Controllers
         private readonly List<string> _imageSizes;
         private readonly IImageService _imageService;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger<AlbumsController> _logger;
 
         public AlbumsController(ApplicationDbContext context,
-            IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<HoliPicsUser> userManager, RoleManager<IdentityRole> roleManager)
-            : base(context, webHostEnvironment, authorizationService, imageService, userManager, roleManager)
+            IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<HoliPicsUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<AlbumsController> logger)
+            : base(context, webHostEnvironment, authorizationService, imageService, userManager, roleManager, logger)
         {
             _context = context;
             _authorizationService = authorizationService;
@@ -41,6 +42,7 @@ namespace HoliPics.Controllers
             };
             _imageService = imageService;
             _roleManager = roleManager;
+            _logger = logger;
         }
 
         // GET: Albums

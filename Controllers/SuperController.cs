@@ -11,6 +11,9 @@ using System.Net;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using HoliPics.Areas.Identity.Data;
+using MetadataExtractor.Formats.Exif;
+using MetadataExtractor;
+using System.Globalization;
 
 namespace HoliPics.Controllers
 {
@@ -22,9 +25,10 @@ namespace HoliPics.Controllers
         private readonly IImageService _imageService;
         private readonly UserManager<HoliPicsUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly ILogger<SuperController> _logger;
         
 
-        public SuperController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<HoliPicsUser> userManager, RoleManager<IdentityRole> roleManager)
+        public SuperController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService, IImageService imageService, UserManager<HoliPicsUser> userManager, RoleManager<IdentityRole> roleManager, ILogger<SuperController> logger)
         {
             _context = context;
             _authorizationService = authorizationService;
@@ -32,6 +36,7 @@ namespace HoliPics.Controllers
             _imageService = imageService;
             _userManager = userManager;
             _roleManager = roleManager;
+            _logger = logger;
         }
 
         public async Task<IActionResult> CheckPermission(Album? album, OperationAuthorizationRequirement operation)
@@ -66,6 +71,28 @@ namespace HoliPics.Controllers
             return Ok();
         }
 
-        
+        public DateTime GetDateTime(Stream fileStream)
+        {
+            var directories = ImageMetadataReader.ReadMetadata(fileStream);
+            var exifSubDirectory = directories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
+            var originalDate = exifSubDirectory?.GetDescription(ExifDirectoryBase.TagDateTimeOriginal);
+
+            DateTime timeOfCreation;
+            if (originalDate != null)
+            {
+                bool parseSucces = DateTime.TryParseExact(originalDate, "yyyy:MM:dd HH:mm:ss", CultureInfo.CurrentCulture,
+                    DateTimeStyles.None, out timeOfCreation);
+                if (!parseSucces) { _logger.LogInformation("DateTime {originalDate} can not be parsed.", originalDate); }
+            }
+            else
+            {
+                timeOfCreation = DateTime.Now;
+                _logger.LogInformation("No DateTime metadata available for image.");
+            }
+
+            return timeOfCreation;
+        }
+
+
     }
 }

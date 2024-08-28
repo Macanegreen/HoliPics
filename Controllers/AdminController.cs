@@ -1,5 +1,6 @@
 ﻿using HoliPics.Areas.Identity.Data;
 using HoliPics.Data;
+using HoliPics.Models;
 using HoliPics.Services.Implementations;
 using HoliPics.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -18,10 +19,11 @@ namespace HoliPics.Controllers
         private readonly IImageService _imageService;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<HoliPicsUser> _userManager;
+        private readonly ILogger<AdminController> _logger;
 
         public AdminController(ApplicationDbContext context, IWebHostEnvironment webHostEnvironment, IAuthorizationService authorizationService,
-            IImageService imageService, RoleManager<IdentityRole> roleManager, UserManager<HoliPicsUser> userManager)
-            : base(context, webHostEnvironment, authorizationService, imageService, userManager, roleManager)
+            IImageService imageService, RoleManager<IdentityRole> roleManager, UserManager<HoliPicsUser> userManager, ILogger<AdminController> logger)
+            : base(context, webHostEnvironment, authorizationService, imageService, userManager, roleManager, logger)
         {
             _context = context;
             _authorizationService = authorizationService;
@@ -29,6 +31,7 @@ namespace HoliPics.Controllers
             _imageService = imageService;
             _roleManager = roleManager;
             _userManager = userManager;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -88,16 +91,24 @@ namespace HoliPics.Controllers
             return RedirectToAction(nameof(Overview));
         }
 
-
         
-        public async Task<IActionResult> TestEmailSender([FromServices] IEmailSenderService emailSenderService)
+        public async Task<IActionResult> UpdateImagesWithDateTime()
         {
-            Console.WriteLine("LLLLLLLLLLLLLLLLLL");
-            var subject = "test";
-            var body = "this is a test";
-            var toAddress = "mikkel.m.joergensen@outlook.dk";
-            await emailSenderService.SendEmailAsync(toAddress, subject, body);
+            List<Img> imgs = await _context.Images.ToListAsync();
+            foreach (Img img in imgs)
+            {
+                if (img.DateTaken == DateTime.MinValue)
+                {
+                    (Stream imgStream, string contentType) = await _imageService.GetImageFromBlob("Small_" + img.FileName);
+                    var dateTaken = GetDateTime(imgStream);
+                    img.DateTaken = dateTaken;
+                    await _context.SaveChangesAsync();
+                }
+            }
             return RedirectToAction(nameof(Overview));
         }
+
+
+
     }
 }

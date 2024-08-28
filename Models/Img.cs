@@ -6,8 +6,8 @@ namespace HoliPics.Models
     {
         [Key]
         public int Id { get; set; }
-
         public int? AlbumId { get; set; }
         public string FileName { get; set; }
+        public DateTime DateTaken { get; set; }
     }
 }
