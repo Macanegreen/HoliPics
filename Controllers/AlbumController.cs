@@ -140,7 +140,7 @@ namespace HoliPics.Controllers
                 foreach (var imageFile in imgs)
                 {       
                     // Add the image filename to the album
-                    album.Images.Add(imageFile.FileName);                    
+                    album.Images.Add(imageFile.FileName);                       
 
                     // Track the changes to imagefile and album
                     _context.Add(imageFile);
@@ -149,6 +149,7 @@ namespace HoliPics.Controllers
                 {
                     album.Thumbnail = "Medium_" + album.Images[0];
                 }
+                album.LastUpdated = DateTime.Now;
 
                 await _context.SaveChangesAsync();
 
@@ -239,6 +240,7 @@ namespace HoliPics.Controllers
             }
 
             album.Images.Remove(id);
+            album.LastUpdated = DateTime.Now;
             if (album.Thumbnail == "Medium_" + id)
             {
                 if (album.Images.Count > 0) { album.Thumbnail = "Medium_" + album.Images[0]; }

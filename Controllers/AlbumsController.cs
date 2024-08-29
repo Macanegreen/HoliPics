@@ -96,9 +96,17 @@ namespace HoliPics.Controllers
 
                 album.CreatorId = _userManager.GetUserId(User);
                 album.CreatedBy = _userManager.GetUserName(User);
+                if (album.CreatorId == null || album.CreatedBy == null)
+                {
+                    return NotFound();
+                }
+                List<string> owners = new List<string>([album.CreatorId]);
+                album.Owners = owners;
 
                 DateTime CreationTime = DateTime.Now;
+                DateTime LastUpdated = DateTime.Now;
                 album.CreationTime = CreationTime;
+                album.LastUpdated = LastUpdated;
                 album.Thumbnail = "placeholder.png";
 
                 var owner = await _userManager.FindByIdAsync(album.CreatorId);                
@@ -156,8 +164,10 @@ namespace HoliPics.Controllers
 
                     // Assign the original unchanged properties to the new album
                     album.CreatorId = original.CreatorId;
+                    album.Owners = original.Owners;
                     album.CreatedBy = original.CreatedBy;
                     album.CreationTime = original.CreationTime;
+                    album.LastUpdated = DateTime.Now;
                     album.Images = original.Images;   
                     album.Thumbnail = original.Thumbnail;
 
