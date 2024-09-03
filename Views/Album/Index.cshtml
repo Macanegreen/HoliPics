@@ -17,10 +17,11 @@
         .dropdown-menu {
             min-width: 1rem;
         }
+        
    </style>
 
 
-    <nav class="navbar navbar-expand navbar-toggleable-sm navbar-dark box-shadow mb-3 full-bleed ignore-padding-top sticky-top" style="background-color: rgba(0,0,0,0.5)">        
+    <nav class="navbar navbar-expand navbar-toggleable-sm navbar-dark box-shadow mb-3 full-bleed ignore-padding-top sticky-top" id="albumNavbar" style="background-color: rgba(0,0,0,0.5)">        
         <div class="container-fluid">           
             <div class="navbar">
                 <a asp-area="" asp-action="Index" asp-controller="Albums" class="btn btn-dark rounded-circle" type="button">
@@ -50,19 +51,19 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="displayDropdown" data-bs-theme="dark">
                                 <li class="dropdown-item">
                                     <input type="radio" class="btn-check" name="btnradio" value="default" id="default-btn" autocomplete="off" checked />
-                                    <label class="btn btn-outline-info" for="default-btn">
+                                    <label class="btn diary-background" for="default-btn">
                                         <i class="bi bi-columns-gap h5"></i>
                                     </label>
                                 </li>
                                 <li class="dropdown-item">
                                     <input type="radio" class="btn-check" name="btnradio" value="info" id="info-btn" autocomplete="off" />
-                                    <label class="btn btn-outline-info" for="info-btn">
+                                    <label class="btn diary-background" for="info-btn">
                                         <i class="bi bi-grid-3x3-gap h5"></i>
                                     </label>
                                 </li>
                                 <li class="dropdown-item">
                                     <input type="radio" class="btn-check" name="btnradio" value="focus" id="focus-btn" autocomplete="off" />
-                                    <label class="btn btn-outline-info" for="focus-btn">
+                                    <label class="btn diary-background" for="focus-btn">
                                         <i class="bi bi-images h5"></i>
                                     </label>
                                 </li>
@@ -76,16 +77,99 @@
     </nav>
 
 
-    <div id="default-display">
-        @await Html.PartialAsync("DefaultDisplayPartial", Model, ViewData)
+    <div id="diaryToggleLeft" style="position: absolute; top: 0vh; left: 0; height: 100%; width: 20px;">
+        <div id="diaryToggleLeftBg" class="diary-background" style="position: fixed; left: 0; height: 100%; width: 20px;"></div>
+        <button class="btn text-light diary-background btn-diary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"
+            style="position: sticky; top: 50%; left: 0; border-radius: 0 60px 60px 0;">
+            <i class="bi bi-layout-text-sidebar h5"></i>
+        </button>
     </div>
 
-    <div id="info-display">
-        @await Html.PartialAsync("InfoDisplayPartial", Model, ViewData)
+
+    <div id="diaryToggleBottom" style="position: fixed; bottom: 0; left: 0; height: 80px; width: 100%; z-index: 2;">
+        <div id="diaryToggleBottomBg" class="diary-background" style="position: fixed; bottom: 0; left: 0; height: 20px; width: 100%;"></div>
+        <button class="btn text-light diary-background btn-diary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"
+                style="position: sticky; top: 100%; left: 50%; border-radius: 60px 60px 0 0;">
+            <i class="bi bi-layout-text-sidebar h5"></i>
+        </button>
     </div>
 
-    <div id="focus-display">
-        @await Html.PartialAsync("FocusDisplayPartial", Model, ViewData)
+
+    <div class="offcanvas offcanvas-start diary-background" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+        <div class="offcanvas-header text-light">
+            <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Holiday Diary</h5>
+            <div id="saveDiaryButton1" class="text-center mx-2">
+                <input class="btn btn-primary" type="button" value="Save" onclick="AjaxFormSubmit()" />
+            </div>
+            <button type="button" class="btn-close text-light text-bg-light" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body" id="offcanvasBody">
+            @{
+                var sortedByDateDict = (SortedDictionary<DateTime, List<string>>?)ViewData["ImagesSortedByDate"];
+                var diaryDict = (SortedDictionary<DateTime, string>?)ViewData["DiaryDict"];
+
+                if (sortedByDateDict != null)
+                {
+                    var numberOfDates = sortedByDateDict.Count;
+                            <div id="numberOfDates" data-value="@numberOfDates" hidden></div>
+                            <div id="albumId" data-value="@Model.Id.ToString()" hidden></div>
+
+                    int i = 0;
+                            <div class="accordion scroll" id="accordionExample">
+                                    @foreach (KeyValuePair<DateTime, List<string>> sortedByDate in sortedByDateDict)
+                            {
+                            string itemId = "collapse" + i.ToString();
+                            string contentId = "content" + i.ToString();
+                            string dateId = "date" + i.ToString();
+
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                        <button id="@dateId" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#@itemId" aria-expanded="true" aria-controls="@itemId" data-value="@sortedByDate.Key.Date.ToString()">
+                                                @sortedByDate.Key.Date.ToString("D")
+                                        </button>
+                                        </h2>
+                                        <div id="@itemId" class="accordion-collapse collapse show">
+                                            <div class="accordion-body">
+                                                @{
+                                            if (diaryDict != null)
+                                            {
+                                                string? content;
+                                                bool hasContent = diaryDict.TryGetValue(sortedByDate.Key, out content);
+                                                if (!hasContent){ content = ""; }
+                                                                                                                                                                                                                                                                        <p contenteditable="true" id="@contentId" class="mb-0">@content</p>                                                                                              
+                                            }
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                i++;
+                            }
+                                                                                                                                                                        
+                            </div>
+
+                }
+            }
+            
+        </div>
+
+        <div id="saveDiaryButton2" class="text-center mt-1 mb-4">
+            <input class="btn btn-primary" type="button" value="Save" onclick="AjaxFormSubmit()" />
+        </div>
+    </div>
+
+
+    <div id="partialDisplay">
+        <div id="default-display">
+            @await Html.PartialAsync("DefaultDisplayPartial", Model, ViewData)
+        </div>
+
+        <div id="info-display">
+            @await Html.PartialAsync("InfoDisplayPartial", Model, ViewData)
+        </div>
+
+        <div id="focus-display">
+            @await Html.PartialAsync("FocusDisplayPartial", Model, ViewData)
+        </div>
     </div>
 
    
@@ -125,8 +209,126 @@
                     document.getElementById("focus-display").style.display = "inline";
                     document.getElementById("focus-active").style.display = "inline";
                 }
+            }  
+        </script>
+
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script type="text/javascript" src="https://ajax.cdnjs.com/ajax/libs/json2/20110223/json2.js"></script>
+
+        <script type="text/javascript">
+            function AjaxFormSubmit() {                
+                
+                var entries = [];
+                var numberOfDates = '' + $("#numberOfDates").data('value');
+
+                for (let i = 0; i < numberOfDates; i++)
+                {
+                    var contentId = "#content" + i;
+                    var content = '' + $(contentId).text();
+                    var dateId = "#date" + i;
+                    var date = '' + $(dateId).data('value');
+                    entries.push({ date: date, content: content });
+                }
+
+                var albumId = '' + $("#albumId").data('value');                
+
+                var diary = { entries: entries, albumId: albumId};
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Album/SaveDiary",
+                    data: JSON.stringify(diary),
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        if (response == true) {
+                            alert("Diary saved!");
+                        }
+                        if (response == null) {
+                            alert("Something went wrong.");
+                        }
+                    }
+                });
             }
-  
+        </script>
+
+        <script type="text/javascript">
+            document.addEventListener("scroll", (event) => {
+                updateOffcanvasPosition(false);
+            });
+
+            window.addEventListener("resize", (event) => {
+                updateOffcanvasPosition(true);
+            });
+
+            updateOffcanvasPosition(true);
+
+            function updateOffcanvasPosition(adjustWidth) {
+                var offcanvas = $("#offcanvasScrolling");
+                var accordionScroll = $("#accordionExample");
+                var saveButton1 = $("#saveDiaryButton1");
+                var saveButton2 = $("#saveDiaryButton2");
+                var diaryToggleLeft = $("#diaryToggleLeft");
+                var diaryToggleBottom = $("#diaryToggleBottom");
+                var viewWidth = window.innerWidth;
+                var viewHeight = window.innerHeight;
+                var partialDisplayBounds = document.getElementById("partialDisplay").getBoundingClientRect();
+
+                var widthOfOffcanvas = partialDisplayBounds.left - 20;
+                var offcanvasPlacedLeft = widthOfOffcanvas > 182;
+
+                // If offcanvas should be placed on the left side...
+                if (offcanvasPlacedLeft) {
+                    saveButton1.hide();
+                    saveButton2.show();
+                    diaryToggleLeft.show();
+                    diaryToggleBottom.hide();
+                    var albumNavbarBounds = document.getElementById("albumNavbar").getBoundingClientRect();
+                    var primaryNavbar = document.getElementById("primaryNavbar").getBoundingClientRect();
+                    var toggleLeftBg = $("#diaryToggleLeftBg");
+
+                    var maxheightOffset;
+                    if (albumNavbarBounds.top > 0) {
+                        maxheightOffset = primaryNavbar.height - 300 - albumNavbarBounds.top;
+                    }
+                    else {
+                        maxheightOffset = primaryNavbar.height - 300;
+                    }
+                    
+                    offcanvas.css('top', albumNavbarBounds.bottom);
+                    accordionScroll.css('max-height', (viewHeight + maxheightOffset));
+                    toggleLeftBg.css('top', albumNavbarBounds.bottom);
+                    
+                    
+                    if (adjustWidth) {
+                        offcanvas.removeClass("offcanvas-bottom").addClass("offcanvas-start");
+                        offcanvas.css('width', widthOfOffcanvas);
+                    }
+                }
+                // ... or the bottom
+                else {
+                    saveButton1.show();
+                    saveButton2.hide();
+                    diaryToggleLeft.hide();
+                    diaryToggleBottom.show();
+                    if (adjustWidth) {                        
+                        offcanvas.removeClass("offcanvas-start").addClass("offcanvas-bottom");                        
+                        offcanvas.css('width', viewWidth);   
+                    }
+                    var currentOffcanvasHeight = offcanvas.css('height').slice(0, -2);
+                    var currentAccordionScrollBounds = document.getElementById("accordionExample").getBoundingClientRect();
+                    
+                    offcanvas.css('top', (viewHeight - currentOffcanvasHeight));
+                    var accordionInt = Math.round(currentAccordionScrollBounds.top);
+                    
+                    accordionScroll.css('max-height', (viewHeight - accordionInt - 20));
+                }
+                
+                
+            }
+
+           
+
         </script>
     }  
 }
