@@ -111,41 +111,41 @@
                 if (sortedByDateDict != null)
                 {
                     var numberOfDates = sortedByDateDict.Count;
-                            <div id="numberOfDates" data-value="@numberOfDates" hidden></div>
-                            <div id="albumId" data-value="@Model.Id.ToString()" hidden></div>
+                                <div id="numberOfDates" data-value="@numberOfDates" hidden></div>
+                                <div id="albumId" data-value="@Model.Id.ToString()" hidden></div>
 
                     int i = 0;
-                            <div class="accordion scroll" id="accordionExample">
-                                    @foreach (KeyValuePair<DateTime, List<string>> sortedByDate in sortedByDateDict)
+                                <div class="accordion scroll" id="accordionExample">
+                                        @foreach (KeyValuePair<DateTime, List<string>> sortedByDate in sortedByDateDict)
                             {
                             string itemId = "collapse" + i.ToString();
                             string contentId = "content" + i.ToString();
                             string dateId = "date" + i.ToString();
 
-                                    <div class="accordion-item">
-                                        <h2 class="accordion-header">
-                                        <button id="@dateId" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#@itemId" aria-expanded="true" aria-controls="@itemId" data-value="@sortedByDate.Key.Date.ToString()">
-                                                @sortedByDate.Key.Date.ToString("D")
-                                        </button>
-                                        </h2>
-                                        <div id="@itemId" class="accordion-collapse collapse show">
-                                            <div class="accordion-body">
-                                                @{
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                            <button id="@dateId" class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#@itemId" aria-expanded="true" aria-controls="@itemId" data-value="@sortedByDate.Key.Date.ToString()">
+                                                    @sortedByDate.Key.Date.ToString("D")
+                                            </button>
+                                            </h2>
+                                            <div id="@itemId" class="accordion-collapse collapse show">
+                                                <div class="accordion-body">
+                                                    @{
                                             if (diaryDict != null)
                                             {
                                                 string? content;
                                                 bool hasContent = diaryDict.TryGetValue(sortedByDate.Key, out content);
                                                 if (!hasContent){ content = ""; }
-                                                                                                                                                                                                                                                                        <p contenteditable="true" id="@contentId" class="mb-0">@content</p>                                                                                              
+                                                                                                                                                                                                                                                                                <p contenteditable="true" id="@contentId" class="mb-0">@content</p>                                                                                              
                                             }
-                                                }
+                                                    }
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                 i++;
                             }
-                                                                                                                                                                        
-                            </div>
+                                                                                                                                                                            
+                                </div>
 
                 }
             }
@@ -243,6 +243,9 @@
                     success: function (response) {
                         if (response == true) {
                             alert("Diary saved!");
+                        }
+                        if (response == false) {
+                            alert("Guests are not allowed to create, edit, or delete ressources.");
                         }
                         if (response == null) {
                             alert("Something went wrong.");

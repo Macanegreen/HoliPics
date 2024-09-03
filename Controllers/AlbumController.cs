@@ -292,7 +292,7 @@ namespace HoliPics.Controllers
                     var album = await _context.Albums.FindAsync(int.Parse(diary.AlbumId));
                     if (album == null) { return new EmptyResult(); }
                     var permissionResult = await CheckPermission(album, AlbumOperations.Delete);
-                    if (permissionResult is not OkResult) { return new EmptyResult(); }
+                    if (permissionResult is not OkResult) { return Json(false); }
 
                     if (album.Diary == null) { album.Diary = new List<string>([]); }
                    
