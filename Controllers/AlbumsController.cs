@@ -101,7 +101,9 @@ namespace HoliPics.Controllers
                     return NotFound();
                 }
                 List<string> owners = new List<string>([album.CreatorId]);
+                List<string> diary = new List<string>([]);
                 album.Owners = owners;
+                album.Diary = diary;
 
                 DateTime CreationTime = DateTime.Now;
                 DateTime LastUpdated = DateTime.Now;
@@ -165,6 +167,7 @@ namespace HoliPics.Controllers
                     // Assign the original unchanged properties to the new album
                     album.CreatorId = original.CreatorId;
                     album.Owners = original.Owners;
+                    album.Diary = original.Diary;
                     album.CreatedBy = original.CreatedBy;
                     album.CreationTime = original.CreationTime;
                     album.LastUpdated = DateTime.Now;

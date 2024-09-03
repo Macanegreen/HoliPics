@@ -14,6 +14,7 @@ using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
 using System.Globalization;
 using System.Collections.Generic;
+using Microsoft.IdentityModel.Tokens;
 
 
 namespace HoliPics.Controllers
@@ -55,13 +56,14 @@ namespace HoliPics.Controllers
             var album = await _context.Albums.FindAsync(id);
             var permissionResult = await CheckPermission(album, AlbumOperations.Read);
             if (permissionResult is not OkResult) { return permissionResult; }
-            ViewData["ImagesSortedByDate"] = await SortedByDate(album.Images);
+            ViewData["ImagesSortedByDate"] = await GetImgSortByDate(album.Images);
+            ViewData["DiaryDict"] = GetDiarySortByDate(album.Diary);
             return View(album);
         }
 
-        private async Task<SortedDictionary<DateTime, List<string>>> SortedByDate(List<string> fileNames)
+        private async Task<SortedDictionary<DateTime, List<string>>> GetImgSortByDate(List<string> fileNames)
         {
-            SortedDictionary < DateTime, List<string> > sortedByDate = new SortedDictionary<DateTime, List<string>>();
+            SortedDictionary <DateTime, List<string>> sortedByDate = new SortedDictionary<DateTime, List<string>>();
             foreach (var fileName in fileNames)
             {
                 var image = await _context.Images.FirstOrDefaultAsync(im => im.FileName == fileName);
@@ -75,6 +77,26 @@ namespace HoliPics.Controllers
                 imageNames.Add(fileName);
             }            
             return sortedByDate;
+        }
+
+        private SortedDictionary<DateTime, string> GetDiarySortByDate(List<string>? diaryString)
+        {
+            SortedDictionary<DateTime, string> diary = new SortedDictionary<DateTime, string>();
+            if (diaryString != null)
+            {
+                foreach (string entry in diaryString)
+                {
+                    var splitted = entry.Split('|');
+                    if (splitted.Length > 0)
+                    {
+                        DateTime date;
+                        bool parsedSucces = DateTime.TryParse(splitted[0], CultureInfo.CurrentCulture,
+                        DateTimeStyles.None, out date);
+                        if (parsedSucces) { diary.Add(date, String.Join("|", splitted.Skip(1))); }
+                    }
+                }
+            }            
+            return diary;
         }
 
         public IActionResult Upload(int id)
@@ -258,7 +280,40 @@ namespace HoliPics.Controllers
             return RedirectToAction(nameof(Index), new { id=image.AlbumId });
         }
 
-        
+
+        [HttpPost]
+        public async Task<ActionResult> SaveDiary([FromBody]Diary diary)
+        {
+            if (diary != null)
+            {
+                List<DiaryEntry> entries = diary.Entries;
+                if (!entries.IsNullOrEmpty())
+                {
+                    var album = await _context.Albums.FindAsync(int.Parse(diary.AlbumId));
+                    if (album == null) { return new EmptyResult(); }
+                    var permissionResult = await CheckPermission(album, AlbumOperations.Delete);
+                    if (permissionResult is not OkResult) { return new EmptyResult(); }
+
+                    if (album.Diary == null) { album.Diary = new List<string>([]); }
+                   
+                    List<string> tmp = new List<string>([]);
+                    foreach (DiaryEntry entry in entries)
+                    {
+                        string entryString = entry.Date + "|" + entry.Content;
+                        tmp.Add(entryString);                 
+                    }
+                    album.Diary = tmp;
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine("HERE");
+                    Console.WriteLine(entries[0].Date + " " + entries[0].Content + " " + diary.AlbumId);
+
+                    return Json(true);
+                }
+            }
+            _logger.LogInformation("Diary is empty");
+            return new EmptyResult();
+        }
+
       
 
     }

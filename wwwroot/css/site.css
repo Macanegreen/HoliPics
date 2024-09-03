@@ -77,10 +77,9 @@ body {
 
 .scroll {
     height: auto;
-    max-height: calc(100vh - 260px);
-    text-align: center;
-    padding: 10px;
+    max-height: calc(100vh - 200px);
     overflow-y: auto;
+    scrollbar-width: none;
 }
 
 .thumbnail {
@@ -100,4 +99,20 @@ body {
     position: absolute;
     transform: translateX(-50%);
     left: 75vw;
+}
+
+.diary-background {
+    background-color: rgba(100,50,100,1);
+}
+
+.btn-diary:hover {
+    background-color: rgba(80,40,80,1);
+}
+
+.btn-diary:active {
+    --bs-btn-active-bg: rgba(80,30,80,1);
+}
+
+.footer {
+    z-index: 1;
 }
