@@ -5,7 +5,8 @@
 
 # My files
 efbundle.exe
-
+git-filter-repo
+appsettings.json
 
 # User-specific files
 *.rsuser
